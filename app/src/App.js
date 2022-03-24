@@ -1,0 +1,53 @@
+import logo from './logo.svg';
+import './App.css';
+import './userCSS.css';
+
+function App() {
+  return (
+    <div className="App">
+      <nav>
+        <div className="nav-container">
+          <img className="nav-logo" src="/img/logo.png" alt=""/>
+          <a className="hide-800" href="/#">Stake</a>
+          <a className="hide-800 active" href="/#">Breeding</a>
+          <a className="hide-800" href="/#">Road Map</a>
+          <a className="hide-800" href="/#">FAQ</a>
+          <a className="hide-800" href="/#">Black Paper</a>
+          <div className="social-icons hide-800">
+            <a href="https://www.instagram.com/arcryptiannft" title="Instagram" target="_top">
+              <img className="nav-social" src="/icons/insta.svg" alt="" />
+            </a>
+            <a href="https://twitter.com/arcryptian_nft" title="Twitter" target="_top">
+              <img className="nav-social" src="/icons/twitter.svg" alt="" />
+            </a>
+            <a href="https://discord.gg/ZugZB8QKmB" title="Discord Link" target="_top">
+              <img className="nav-social" src="/icons/discord.svg" alt="" />
+            </a>
+          </div>
+        </div>
+      </nav>
+      
+      <div className="content-wrapper">
+      <div id="link2" className="container card">
+          <h1 className="pb-3" style={{textAlign: 'center'}}>Arcryptian Breeding</h1>
+          <p className="text-secondary-color">NFT breeding refers to mint a new non-fungible token to a user who has 2 arcryptians(adult man and woman) and paid some $ARC.</p>
+          <p>Heres the arcyptian breeding requirements:</p>
+          <br />
+          <h4 style={{textAlign: 'left'}}>• Must put two arcyptians: One is man and the other is woman</h4>
+          <br/>
+          <h4 style={{textAlign: 'left'}}>• Must be adult to breed a new baby arcryptian</h4>
+          <br/>
+          <h4 style={{textAlign: 'left'}}>• Must pay X $ARC to breed</h4>
+          <br/>
+          <h4 style={{textAlign: 'left'}}>• Must wait for incubation</h4>
+          <br/>
+          <a href="https://stake.arcryptiannft.com">
+            <img className="center" src="/img/button.png" alt="" style={{flex: '1 1 0%', alignItems: 'center', width: '50%', padding: '20px 0px 0px', visibility: 'visible'}}/>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
