@@ -1,0 +1,22 @@
+{
+    "name": "Arcryptian #2",
+    "symbol": "A",
+    "description": "Digital Feelings",
+    "seller_fee_basis_points": 1000,
+    "image": "1.jpg",
+    "attributes": [
+        {"trait_type": "Background", "value": "G0"},
+        {"trait_type": "gEyes", "value": "G1"}, 
+        {"trait_type": "gAccent", "value": "G2"},
+        {"trait_type": "gFace", "value": "G3"},
+        {"trait_type": "gFeatures", "value": "G4"},
+        {"trait_type": "gHair", "value": "G5"},
+        {"trait_type": "gDecor", "value": "G6"},
+        {"trait_type": "gProp", "value": "G8"},
+        {"trait_type": "gEyeWear", "value": "G9"}
+    ],
+    "properties": {
+        "creators": [{"address": "8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi", "share": 100}],
+        "files": [{"uri": "1.jpg", "type": "image/jpg"}]
+    }
+}

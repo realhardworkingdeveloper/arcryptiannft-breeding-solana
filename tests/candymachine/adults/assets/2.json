@@ -1,0 +1,23 @@
+{
+    "name": "Arcryptian #3",
+    "symbol": "A",
+    "description": "Digital Feelings",
+    "seller_fee_basis_points": 1000,
+    "image": "2.jpg",
+    "attributes": [
+        {"trait_type": "Background", "value": "BLACK"},
+        {"trait_type": "mEyes", "value": "BlueGreen"}, 
+        {"trait_type": "mAccent", "value": "YellowBlue"},
+        {"trait_type": "mFace", "value": "Orange"},
+        {"trait_type": "mFeatures", "value": "Red"},
+        {"trait_type": "mHair", "value": "YellowPurple"},
+        {"trait_type": "mDecor", "value": "5Star"},
+        {"trait_type": "mStash", "value": "None"},
+        {"trait_type": "mProp", "value": "Guitar"},
+        {"trait_type": "mEyeWear", "value": "None"}
+    ],
+    "properties": {
+        "creators": [{"address": "8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi", "share": 100}],
+        "files": [{"uri": "2.jpg", "type": "image/jpg"}]
+    }
+}
