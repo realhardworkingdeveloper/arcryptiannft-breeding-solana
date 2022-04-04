@@ -13,6 +13,10 @@ export interface AlertState {
   severity: 'success' | 'info' | 'warning' | 'error' | undefined;
 }
 
+export interface BreedingStatus {
+  status: 'NOTSTART' | 'BREEDING' | 'READYTOMINT' | 'MINTING';
+}
+
 export const toDate = (value?: anchor.BN) => {
   if (!value) {
     return;

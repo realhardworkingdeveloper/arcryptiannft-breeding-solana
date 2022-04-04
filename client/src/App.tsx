@@ -30,8 +30,6 @@ const theme = createTheme({
 
 const getCandyMachineId = (): anchor.web3.PublicKey | undefined => {
   try {
-    console.log(process.env.REACT_APP_ADULT_CANDY_MACHINE_ID);
-
     const candyMachineId = new anchor.web3.PublicKey(
       process.env.REACT_APP_ADULT_CANDY_MACHINE_ID!,
     );

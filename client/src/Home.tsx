@@ -17,10 +17,12 @@ import {
   getCandyMachineState,
   mintOneToken,
 } from './candy-machine';
-import { AlertState, toDate, formatNumber, getAtaForMint } from './utils';
+import { AlertState, BreedingStatus } from './utils';
+import { programs } from "@metaplex/js";
+import { FetchNFTsByWallet } from './lib/FetchNFTsByWallet';
+
+import { ParentChooseButton } from './ParentChooseButton';
 import { MintButton } from './MintButton';
-import { GatewayProvider } from '@civic/solana-gateway-react';
-import { sendTransaction } from './connection';
 
 const ConnectButton = styled(WalletDialogButton)`
   width: 100%;
@@ -33,7 +35,8 @@ const ConnectButton = styled(WalletDialogButton)`
   font-weight: bold;
 `;
 
-const MintContainer = styled.div``; // add your owns styles here
+const { MetadataData } = programs.metadata;
+const adult_arcryptian_prefix = process.env.REACT_APP_ADULT_NAME_PREFIX;
 
 export interface HomeProps {
   candyMachineId?: anchor.web3.PublicKey;
@@ -43,7 +46,9 @@ export interface HomeProps {
 }
 
 const Home = (props: HomeProps) => {
-  const [isUserBreeding, setIsUserBreeding] = useState(false);
+  const [breedingStatus, setBreedingStatus] = useState<BreedingStatus>({
+    status: 'NOTSTART'
+  });
   const [isParentChosen, setIsParentChosen] = useState(false);
   const [candyMachine, setCandyMachine] = useState<CandyMachineAccount>();
   const [alertState, setAlertState] = useState<AlertState>({
@@ -53,7 +58,11 @@ const Home = (props: HomeProps) => {
   });
 
   const [isActive, setIsActive] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [itemsRemaining, setItemsRemaining] = useState<number>();
+
+  const [maleList, setMaleList] = useState([]);
+  const [femaleList, setFemaleList] = useState([]);
 
   const rpcUrl = props.rpcHost;
   const wallet = useWallet();
@@ -127,7 +136,6 @@ const Home = (props: HomeProps) => {
     afterTransactions: Transaction[] = [],
   ) => {
     try {
-      setIsUserBreeding(true);
       document.getElementById('#identity')?.click();
       if (wallet.connected && candyMachine?.program && wallet.publicKey) {
         let mintOne = await mintOneToken(
@@ -199,7 +207,6 @@ const Home = (props: HomeProps) => {
       // information on chain
       refreshCandyMachineState();
     } finally {
-      setIsUserBreeding(false);
     }
   };
 
@@ -209,8 +216,58 @@ const Home = (props: HomeProps) => {
     setIsActive((candyMachine!.state.isActive = active));
   };
 
+  async function getNFTList() {
+    const { publicKey } = wallet;
+    if (!publicKey) {
+      setMaleList([]);
+      setFemaleList([]);
+      return null;
+    };
+
+    let userNFTs, males:any = [], females:any = [];
+    try {
+      userNFTs = await FetchNFTsByWallet(
+        new PublicKey(publicKey),
+        props.connection
+      );
+
+      if (typeof userNFTs === "undefined") {
+        setMaleList([]);
+        setFemaleList([]);
+        return null;
+      } else {
+        userNFTs.forEach(async (nft: any) => {
+          if(nft?.data?.name?.includes(adult_arcryptian_prefix) == true) {
+            let data = await (await fetch(nft?.data?.uri)).json();
+
+            if(data?.attributes[0]?.trait_type.charAt(0) === 'm' || data?.attributes[1]?.trait_type.charAt(0) === 'm') {
+              males.push(data);
+            } else if(data?.attributes[0]?.trait_type.charAt(0) === 'f' || data?.attributes[1]?.trait_type.charAt(0) === 'f') {
+              females.push(data);
+            }
+          }
+        })
+
+        setMaleList(males);
+        setFemaleList(females);
+        return userNFTs;
+      }
+    } catch (error) {
+      console.log("error: ", error);
+      return null;
+    }
+  }
+
   useEffect(() => {
     refreshCandyMachineState();
+
+    if (wallet.connected && !isFetching) {
+      setIsFetching(true);
+      (async () => {
+        await getNFTList();
+        setIsFetching(false);
+      })();
+    }
   }, [
     anchorWallet,
     props.candyMachineId,
@@ -222,19 +279,33 @@ const Home = (props: HomeProps) => {
     <Container style={{ marginTop: 100 }}>
       <Container className='breeding' maxWidth="xs" style={{ position: 'relative' }}>
           {!wallet.connected ? (
-            <ConnectButton>Connect Wallet</ConnectButton>
+            // <ConnectButton>Connect Wallet</ConnectButton>
+            <ParentChooseButton
+                maleList={maleList}
+                femaleList={femaleList}
+                candyMachine={candyMachine}
+                setBreedingStatus={setBreedingStatus}
+              />
           ) : (
-            <>
-              <MintContainer>
-                  <MintButton
-                    candyMachine={candyMachine}
-                    isMinting={isUserBreeding}
-                    setIsMinting={val => setIsUserBreeding(val)}
-                    onMint={onMint}
-                    isActive={isActive}
-                  />
-              </MintContainer>
-            </>
+            breedingStatus.status === 'NOTSTART' ? (
+              <ParentChooseButton
+                maleList={maleList}
+                femaleList={femaleList}
+                candyMachine={candyMachine}
+                setBreedingStatus={setBreedingStatus}
+              />
+            ) : (
+              breedingStatus.status === 'BREEDING' ? (
+                <p>Countdown</p>
+              ) : (
+                <MintButton
+                  candyMachine={candyMachine}
+                  breedingStatus={breedingStatus}
+                  onMint={onMint}
+                  isActive={isActive}
+                />
+              )
+            )
           )}
       </Container>
 

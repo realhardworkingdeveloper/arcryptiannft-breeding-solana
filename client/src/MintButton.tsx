@@ -4,6 +4,7 @@ import { CandyMachineAccount } from './candy-machine';
 import { CircularProgress } from '@material-ui/core';
 import { useEffect, useState, useRef } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { BreedingStatus } from './utils';
 
 export const CTAButton = styled(Button)`
   width: 100%;
@@ -19,14 +20,12 @@ export const CTAButton = styled(Button)`
 export const MintButton = ({
   onMint,
   candyMachine,
-  isMinting,
-  setIsMinting,
+  breedingStatus,
   isActive,
 }: {
   onMint: () => Promise<void>;
   candyMachine?: CandyMachineAccount;
-  isMinting: boolean;
-  setIsMinting: (val: boolean) => void;
+  breedingStatus: BreedingStatus;
   isActive: boolean;
 }) => {
   const wallet = useWallet();
@@ -38,13 +37,8 @@ export const MintButton = ({
   const getMintButtonContent = () => {
     if (candyMachine?.state.isSoldOut) {
       return 'SOLD OUT';
-    } else if (isMinting) {
+    } else if (breedingStatus.status === 'MINTING' ) {
       return <CircularProgress />;
-    } else if (
-      candyMachine?.state.isPresale ||
-      candyMachine?.state.isWhitelistOnly
-    ) {
-      return 'WHITELIST MINT';
     }
 
     return 'MINT';
@@ -70,7 +64,7 @@ export const MintButton = ({
 
   return (
     <CTAButton
-      disabled={isMinting || !isActive}
+      disabled={breedingStatus.status !== 'READYTOMINT' || !isActive}
       onClick={async () => {
         
           await onMint();
@@ -83,10 +77,3 @@ export const MintButton = ({
   );
 };
 
-function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
-}
