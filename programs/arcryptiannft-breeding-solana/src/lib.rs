@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 
+mod contexts;
+use contexts::*;
+
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
@@ -10,6 +13,3 @@ pub mod arcryptiannft_breeding_solana {
         Ok(())
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}

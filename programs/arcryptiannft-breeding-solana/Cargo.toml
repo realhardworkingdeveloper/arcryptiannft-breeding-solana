@@ -1,7 +1,7 @@
 [package]
 name = "arcryptiannft-breeding-solana"
-version = "0.1.0"
-description = "Created with Anchor"
+version = "0.0.1"
+description = "David Tanaka <realhardworkingdeveloper@gmail.com>"
 edition = "2018"
 
 [lib]
@@ -17,3 +17,4 @@ default = []
 
 [dependencies]
 anchor-lang = "0.23.0"
+anchor-spl = "0.23.0"
