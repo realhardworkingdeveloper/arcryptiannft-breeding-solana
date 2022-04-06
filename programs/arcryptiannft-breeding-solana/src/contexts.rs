@@ -6,16 +6,56 @@ use std::ops::Deref;
 pub struct InitializeBreeding<'info> {
     #[account(
         init,
-        seeds = [authority.key().as_ref()],
+        seeds = [authority.key().as_ref(), b"arcryptian_breeding"],
         bump,
         payer = authority,
         space = Breeding::space(),
     )]
     pub breeding: Account<'info, Breeding>,
 
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+
+    pub clock: Sysvar<'info,Clock>,
+}
+
+#[derive(Accounts)]
+pub struct StartBreeding<'info> {
+    #[account(mut)]
+    pub breeding: Account<'info, Breeding>,
+
     #[account(
         mut,
-        seeds = [b"male"],
+        constraint = lock_account
+         .clone().into_inner().deref().owner == authority.key(),
+    )]
+    pub lock_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        constraint = user_wallet
+         .clone().into_inner().deref().owner == authority.key(),
+    )]
+    pub user_wallet: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+
+    pub clock: Sysvar<'info,Clock>,
+}
+
+#[derive(Accounts)]
+pub struct FinishBreeding<'info> {
+    #[account(mut)]
+    pub breeding: Account<'info, Breeding>,
+
+    #[account(
+        mut,
+        seeds = [authority.key().as_ref(), b"male"],
         bump,
         constraint = male_lock_account
          .clone().into_inner().deref().owner == authority.key(),
@@ -24,7 +64,7 @@ pub struct InitializeBreeding<'info> {
 
     #[account(
         mut,
-        seeds = [b"female"],
+        seeds = [authority.key().as_ref(), b"female"],
         bump,
         constraint = female_lock_account
          .clone().into_inner().deref().owner == authority.key(),
