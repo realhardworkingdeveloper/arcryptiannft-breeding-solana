@@ -1,14 +1,14 @@
 [features]
 seeds = false
 [programs.localnet]
-arcryptiannft_breeding_solana = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+arcryptiannft_breeding_solana = "7MFw3o88qjGDRcvXr217A54cMp3chWi5qF2fng1qWshU"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
-wallet = "/home/chen34/.config/solana/id.json"
+cluster = "devnet"
+wallet = "/home/chen34/.config/solana/devnet.json"
 
 [scripts]
 test = "yarn run mocha -t 1000000 tests/"

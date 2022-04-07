@@ -7,7 +7,11 @@ import Paper from '@material-ui/core/Paper';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import {
+  PublicKey,
+  Transaction,
+  Connection
+} from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletDialogButton } from '@solana/wallet-adapter-material-ui';
 import {
@@ -16,13 +20,23 @@ import {
   CANDY_MACHINE_PROGRAM,
   getCandyMachineState,
   mintOneToken,
+  getCandyMachineCreator,
 } from './candy-machine';
 import { AlertState, BreedingStatus } from './utils';
 import { programs } from "@metaplex/js";
-import { FetchNFTsByWallet } from './lib/FetchNFTsByWallet';
 
 import { ParentChooseButton } from './ParentChooseButton';
 import { MintButton } from './MintButton';
+
+import * as BreedingAdapter from './lib/BreedingAdapter';
+import { FetchNFTs } from './lib/FetchNFTByCandymachine';
+
+import idl from './idl/arcryptiannft_breeding_solana.json';
+
+const { SystemProgram, SYSVAR_RENT_PUBKEY, SYSVAR_CLOCK_PUBKEY } = anchor.web3;
+
+const MALE_NFT_MINT="5RDueirYhLTZHyDSCwZ3gSWtMhFzDgj6pxFWkh3uGRf3";
+const FEMALE_NFT_MINT="ARMLau6scq9xujMvZwDdFgQr7GYFgA6bmfpjtaKZHPiK";
 
 const ConnectButton = styled(WalletDialogButton)`
   width: 100%;
@@ -36,7 +50,7 @@ const ConnectButton = styled(WalletDialogButton)`
 `;
 
 const { MetadataData } = programs.metadata;
-const adult_arcryptian_prefix = process.env.REACT_APP_ADULT_NAME_PREFIX;
+const nft_authority_owner = process.env.REACT_APP_ADULT_AUTHORITY_PUBKEY;
 
 export interface HomeProps {
   candyMachineId?: anchor.web3.PublicKey;
@@ -66,6 +80,8 @@ const Home = (props: HomeProps) => {
 
   const rpcUrl = props.rpcHost;
   const wallet = useWallet();
+
+  const breeding_connection = [wallet, props.connection];
 
   const anchorWallet = useMemo(() => {
     if (
@@ -216,7 +232,7 @@ const Home = (props: HomeProps) => {
     setIsActive((candyMachine!.state.isActive = active));
   };
 
-  async function getNFTList() {
+  const getNFTList = async () =>  {
     const { publicKey } = wallet;
     if (!publicKey) {
       setMaleList([]);
@@ -226,29 +242,37 @@ const Home = (props: HomeProps) => {
 
     let userNFTs, males:any = [], females:any = [];
     try {
-      userNFTs = await FetchNFTsByWallet(
+      userNFTs = await FetchNFTs(
         new PublicKey(publicKey),
         props.connection
       );
+
+      console.log(userNFTs);
 
       if (typeof userNFTs === "undefined") {
         setMaleList([]);
         setFemaleList([]);
         return null;
       } else {
-        console.log(userNFTs);
+        // console.log(userNFTs);
         userNFTs.forEach(async (nft: any) => {
-          if(nft?.data?.name?.includes(adult_arcryptian_prefix) == true) {
-            let data = await (await fetch(nft?.data?.uri)).json();
+          if(nft?.updateAuthority == nft_authority_owner) {
+            try {
+              let data = await (await fetch(nft?.data?.uri)).json();
 
-            if(data?.attributes[0]?.trait_type.charAt(0) === 'm' || data?.attributes[1]?.trait_type.charAt(0) === 'm') {
-              males.push(data);
-            } else if(data?.attributes[0]?.trait_type.charAt(0) === 'f' || data?.attributes[1]?.trait_type.charAt(0) === 'f') {
-              females.push(data);
+              if(data?.attributes[0]?.trait_type.charAt(0) === 'm' || data?.attributes[1]?.trait_type.charAt(0) === 'm') {
+                males.push(nft);
+              } else if(data?.attributes[0]?.trait_type.charAt(0) === 'f' || data?.attributes[1]?.trait_type.charAt(0) === 'f') {
+                females.push(nft);
+              }
+            } catch {
+              console.log("nft metadata is not available");
             }
           }
-        })
+        });
 
+        console.log(males);
+        console.log(females);
         setMaleList(males);
         setFemaleList(females);
         return userNFTs;
@@ -257,7 +281,7 @@ const Home = (props: HomeProps) => {
       console.log("error: ", error);
       return null;
     }
-  }
+  };
 
   useEffect(() => {
     refreshCandyMachineState();
@@ -265,6 +289,16 @@ const Home = (props: HomeProps) => {
     if (wallet.connected && !isFetching) {
       setIsFetching(true);
       (async () => {
+        console.log('breeding initialize');
+        // const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
+
+        // if (breeding_info === undefined) {
+        //   console.log("Transaction Failed")
+        // } else {
+        //   console.log('get nft list');
+        //   await getNFTList();
+        //   // await FetchNFT.run(...breeding_connection);
+        // }
         await getNFTList();
         setIsFetching(false);
       })();

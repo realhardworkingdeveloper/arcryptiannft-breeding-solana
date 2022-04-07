@@ -1,0 +1,135 @@
+{
+  "version": "0.0.1",
+  "name": "arcryptiannft_breeding_solana",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "breeding",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "start",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "breeding",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "maleNftTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "femaleNftTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "allowedCollectionAddress",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adultNftProgramId",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Breeding",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "isBreeding",
+            "type": "bool"
+          },
+          {
+            "name": "isMaleLocked",
+            "type": "bool"
+          },
+          {
+            "name": "isFemaleLocked",
+            "type": "bool"
+          },
+          {
+            "name": "allowedCollectionAddress",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "7MFw3o88qjGDRcvXr217A54cMp3chWi5qF2fng1qWshU"
+  }
+}

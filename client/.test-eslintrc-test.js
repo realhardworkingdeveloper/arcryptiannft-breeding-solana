@@ -1,0 +1,30 @@
+module.exports = {
+    extends: ["react-app"],
+    rules: {
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "react/prop-types": "off",
+        "react/display-name": "off",
+        // "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "object-curly-newline": "off",
+        "arrow-body-style": "off",
+        "react/jsx-props-no-spreading": "off",
+        "implicit-arrow-linebreak": "off",
+        "func-names": "off",
+        "operator-linebreak": "off",
+        "function-paren-newline": "off",
+        "react/require-default-props": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "react/jsx-curly-newline": "off",
+        "react/jsx-wrap-multilines": "off",
+        "react/destructuring-assignment": "off",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": ["warn"],
+        "react/no-array-index-key": "off"
+    },
+    plugins: ["react", "@typescript-eslint"]
+  };

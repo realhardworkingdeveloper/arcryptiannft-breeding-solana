@@ -7,8 +7,7 @@ const {
 
 const { TokenAccount } = programs.core;
 
-export const FetchNFTsByWallet = async (userWallet, connection) => {
-    console.log("wallet", userWallet)
+export const FetchNFTs = async (userWallet, connection) => {
   const accounts = await TokenAccount.getTokenAccountsByOwner(
     connection,
     userWallet
@@ -37,7 +36,7 @@ export const FetchNFTsByWallet = async (userWallet, connection) => {
     ?.map((info) => {
       return info?.data !== undefined
         ? MetadataData.deserialize(info?.data)
-        : undefined
+        : undefined;
       }
     )
     .filter(function (element) {
