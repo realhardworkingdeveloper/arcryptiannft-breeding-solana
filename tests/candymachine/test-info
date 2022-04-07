@@ -1,0 +1,15 @@
+phantom-wallet: 8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
+
+-> adult
+Candy machine address:  FqAAJUyZx3XszJ4eV3PmHWsezi1jGaaUdUPUZCxtfmLY
+Collection metadata address:  CgcBJv1PTeEUznU58jJLx5czVVm14ct3wUERX5Tw9yF6
+Collection metadata authority:  8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
+Collection master edition address:  7AS2bCw8vNpnuDexjTgRBSxWHqMQSFDW85fWwASYSAmt
+Collection mint address:  CGmkFn7fvsHGwiAPKi8ZFQRPK7vPg6f75gEdqGSinJsN
+Collection PDA address:  8NZ1mbY6f4Zp2H6xtgtSsvkQ3cU4VyyDSXT1JikNrLKr
+Collection authority record address:  A2fMwLQZbyBgFfTDmUB9Pvzqwyu78QSctPGPRTZ17qkt
+Collection:  {
+  collectionMetadata: 'CgcBJv1PTeEUznU58jJLx5czVVm14ct3wUERX5Tw9yF6',
+  collectionPDA: '8NZ1mbY6f4Zp2H6xtgtSsvkQ3cU4VyyDSXT1JikNrLKr',
+  txId: 'PUdSn3F5jyCiS2JvCQswEc3w3EqbMieQggxw5QsH2acifWzTMJFjnWPMVpxBi75rWzN3GtdCeA8gjwYEnivsDbi'
+}

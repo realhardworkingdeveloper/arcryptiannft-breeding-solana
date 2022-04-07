@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 
+mod env;
+use env::*;
+
 mod contexts;
 use contexts::*;
 
@@ -24,16 +27,16 @@ pub mod arcryptiannft_breeding_solana {
         Ok(())
     }
 
-    pub fn start(ctx: Context<StartBreeding>) -> Result<()> {
+    // pub fn start(ctx: Context<StartBreeding>) -> Result<()> {
         
-        let breeding = &mut ctx.accounts.breeding;
+    //     let breeding = &mut ctx.accounts.breeding;
 
-        if breeding.is_breeding == true {
-            msg!("Breeding is already started.");
-            return Ok(());
-        }
+    //     if breeding.is_breeding == true {
+    //         msg!("Breeding is already started.");
+    //         return Ok(());
+    //     }
 
-        let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
+    //     let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
         // update_reward_pool(
         //     current_timestamp,
         //     staking_instance,
@@ -62,6 +65,6 @@ pub mod arcryptiannft_breeding_solana {
         //     user_instance,
         // );
         
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }

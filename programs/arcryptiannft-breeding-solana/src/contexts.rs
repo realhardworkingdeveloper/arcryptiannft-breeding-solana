@@ -1,15 +1,22 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::TokenAccount;
+use anchor_spl::token::{
+    TokenAccount,
+    Mint,
+};
 use std::ops::Deref;
 
 #[derive(Accounts)]
+#[instruction(
+    _breeding_bump: u8,
+)]
 pub struct InitializeBreeding<'info> {
     #[account(
-        init,
-        seeds = [authority.key().as_ref(), b"arcryptian_breeding"],
-        bump,
-        payer = authority,
-        space = Breeding::space(),
+        mut,
+        seeds = [
+            authority.key().as_ref(),
+            crate::BREEDING_SEED.as_ref(),
+        ],
+        bump = _breeding_bump,
     )]
     pub breeding: Account<'info, Breeding>,
 
@@ -22,9 +29,31 @@ pub struct InitializeBreeding<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(
+    _breeding_bump: u8,
+)]
 pub struct StartBreeding<'info> {
     #[account(mut)]
+    pub authority: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [
+            authority.key().as_ref(),
+            crate::BREEDING_SEED.as_ref(),
+        ],
+        bump = _breeding_bump,
+    )]
     pub breeding: Account<'info, Breeding>,
+
+    #[account(mut)]
+    pub nft_token_mint: Box<Account<'info, Mint>>,
+
+    #[account(
+        constraint = nft_token_metadata.owner
+            == &adult_nft_program_id.key(),
+    )]
+    pub nft_token_metadata: AccountInfo<'info>, 
 
     #[account(
         mut,
@@ -35,13 +64,33 @@ pub struct StartBreeding<'info> {
 
     #[account(
         mut,
-        constraint = user_wallet
-         .clone().into_inner().deref().owner == authority.key(),
+        constraint = user_wallet.clone().into_inner().deref().owner 
+            == authority.key(),
+        constraint = user_wallet.clone().into_inner().deref().mint 
+            == nft_token_mint.key(),
     )]
-    pub user_wallet: Account<'info, TokenAccount>,
+    pub user_wallet: Box<Account<'info, TokenAccount>>,
 
-    #[account(mut)]
-    pub authority: Signer<'info>,
+    #[account(
+        constraint = allowed_collection_address.key() 
+            == breeding.allowed_collection_address,
+        constraint = user_wallet.clone().into_inner().deref().mint 
+            == nft_token_mint.key(),
+    )]
+    pub allowed_collection_address: AccountInfo<'info>,
+
+    #[account(
+        constraint = 
+            token_program.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
+    )]
+    pub token_program: AccountInfo<'info>,
+
+    #[account(
+        constraint = 
+        adult_nft_program_id.key() == 
+            crate::ADULT_NFT_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
+    )]
+    pub adult_nft_program_id: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
 
@@ -86,6 +135,9 @@ pub struct Breeding {
     pub authority: Pubkey,
     pub timestamp: u64,     // 8
     pub is_breeding: bool,  // 1
+
+    // this address is being checked as a verified creator of nft
+    pub allowed_collection_address: Pubkey
 }
 
 impl Breeding {

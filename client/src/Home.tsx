@@ -236,6 +236,7 @@ const Home = (props: HomeProps) => {
         setFemaleList([]);
         return null;
       } else {
+        console.log(userNFTs);
         userNFTs.forEach(async (nft: any) => {
           if(nft?.data?.name?.includes(adult_arcryptian_prefix) == true) {
             let data = await (await fetch(nft?.data?.uri)).json();
@@ -279,13 +280,13 @@ const Home = (props: HomeProps) => {
     <Container style={{ marginTop: 100 }}>
       <Container className='breeding' maxWidth="xs" style={{ position: 'relative' }}>
           {!wallet.connected ? (
-            // <ConnectButton>Connect Wallet</ConnectButton>
-            <ParentChooseButton
-                maleList={maleList}
-                femaleList={femaleList}
-                candyMachine={candyMachine}
-                setBreedingStatus={setBreedingStatus}
-              />
+            <ConnectButton>Connect Wallet</ConnectButton>
+            // <ParentChooseButton
+            //     maleList={maleList}
+            //     femaleList={femaleList}
+            //     candyMachine={candyMachine}
+            //     setBreedingStatus={setBreedingStatus}
+            //   />
           ) : (
             breedingStatus.status === 'NOTSTART' ? (
               <ParentChooseButton
