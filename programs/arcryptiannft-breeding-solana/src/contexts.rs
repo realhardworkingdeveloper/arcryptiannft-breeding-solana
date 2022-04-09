@@ -49,51 +49,33 @@ pub struct StartBreeding<'info> {
     pub female_nft_token_mint: Box<Account<'info, Mint>>,
 
     #[account(
-        constraint = nft_token_metadata.owner
-            == &adult_nft_program_id.key(),
-    )]
-    /// CHECK: okay
-    pub nft_token_metadata: AccountInfo<'info>, 
-
-    #[account(
         mut,
-        constraint = lock_account
+        constraint = male_user_wallet
          .clone().into_inner().deref().owner == authority.key(),
     )]
-    pub lock_account: Account<'info, TokenAccount>,
+    pub male_user_wallet: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
-        constraint = user_wallet.clone().into_inner().deref().owner 
-            == authority.key(),
-        constraint = 
-            user_wallet.clone().into_inner().deref().mint == male_nft_token_mint.key() || 
-            user_wallet.clone().into_inner().deref().mint == female_nft_token_mint.key(),
+        constraint = female_user_wallet
+         .clone().into_inner().deref().owner == authority.key(),
     )]
-    pub user_wallet: Box<Account<'info, TokenAccount>>,
+    pub female_user_wallet: Box<Account<'info, TokenAccount>>,
 
-    #[account(
-        constraint = allowed_collection_address.key() 
-            == breeding.allowed_collection_address,
-        constraint = 
-            user_wallet.clone().into_inner().deref().mint == male_nft_token_mint.key() ||
-            user_wallet.clone().into_inner().deref().mint == female_nft_token_mint.key(),
-    )]
-    /// CHECK: okay
-    pub allowed_collection_address: AccountInfo<'info>,
+    #[account(mut)]
+    pub male_lock_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub female_lock_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         constraint = 
-            token_program.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
+            token_program_id.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
     )]
     /// CHECK: 
-    pub token_program: AccountInfo<'info>,
+    pub token_program_id: AccountInfo<'info>,
 
-    #[account(
-        constraint = 
-        adult_nft_program_id.key() == 
-            crate::ADULT_NFT_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
-    )]
+    #[account()]
     /// CHECK:
     pub adult_nft_program_id: AccountInfo<'info>,
 
@@ -124,51 +106,33 @@ pub struct FinishBreeding<'info> {
     pub female_nft_token_mint: Box<Account<'info, Mint>>,
 
     #[account(
-        constraint = nft_token_metadata.owner
-            == &adult_nft_program_id.key(),
-    )]
-    /// CHECK:
-    pub nft_token_metadata: AccountInfo<'info>, 
-
-    #[account(
         mut,
-        constraint = lock_account
+        constraint = male_user_wallet
          .clone().into_inner().deref().owner == authority.key(),
     )]
-    pub lock_account: Account<'info, TokenAccount>,
+    pub male_user_wallet: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
-        constraint = user_wallet.clone().into_inner().deref().owner 
-            == authority.key(),
-        constraint = 
-            user_wallet.clone().into_inner().deref().mint == male_nft_token_mint.key() || 
-            user_wallet.clone().into_inner().deref().mint == female_nft_token_mint.key(),
+        constraint = female_user_wallet
+         .clone().into_inner().deref().owner == authority.key(),
     )]
-    pub user_wallet: Box<Account<'info, TokenAccount>>,
+    pub female_user_wallet: Box<Account<'info, TokenAccount>>,
 
-    #[account(
-        constraint = allowed_collection_address.key() 
-            == breeding.allowed_collection_address,
-        constraint = 
-            user_wallet.clone().into_inner().deref().mint == male_nft_token_mint.key() ||
-            user_wallet.clone().into_inner().deref().mint == female_nft_token_mint.key(),
-    )]
-    /// CHECK:
-    pub allowed_collection_address: AccountInfo<'info>,
+    #[account(mut)]
+    pub male_lock_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub female_lock_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         constraint = 
-            token_program.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
+            token_program_id.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
     )]
-    /// CHECK:
-    pub token_program: AccountInfo<'info>,
+    /// CHECK: 
+    pub token_program_id: AccountInfo<'info>,
 
-    #[account(
-        constraint = 
-        adult_nft_program_id.key() == 
-            crate::ADULT_NFT_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
-    )]
+    #[account()]
     /// CHECK:
     pub adult_nft_program_id: AccountInfo<'info>,
 

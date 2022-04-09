@@ -52,27 +52,27 @@
           "isSigner": false
         },
         {
-          "name": "nftTokenMetadata",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "lockAccount",
+          "name": "maleUserWallet",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userWallet",
+          "name": "femaleUserWallet",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "allowedCollectionAddress",
-          "isMut": false,
+          "name": "maleLockAccount",
+          "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "femaleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgramId",
           "isMut": false,
           "isSigner": false
         },
@@ -93,6 +93,77 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "finish",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "breeding",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "maleNftTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "femaleNftTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "maleUserWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "femaleUserWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "maleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "femaleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgramId",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adultNftProgramId",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "breedingBump",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [

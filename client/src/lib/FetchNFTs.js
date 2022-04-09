@@ -18,6 +18,8 @@ const candyMachineId = new PublicKey('FqAAJUyZx3XszJ4eV3PmHWsezi1jGaaUdUPUZCxtfm
 export const getMintAddresses = async (_, connection) => {
   const candyMachineCreator = await getCandyMachineCreator(candyMachineId);
 
+  console.log(candyMachineCreator);
+
   const metadataAccounts = await connection.getProgramAccounts(
       TOKEN_METADATA_PROGRAM,
       {

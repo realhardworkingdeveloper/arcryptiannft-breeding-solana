@@ -35,9 +35,6 @@ import idl from './idl/arcryptiannft_breeding_solana.json';
 
 const { SystemProgram, SYSVAR_RENT_PUBKEY, SYSVAR_CLOCK_PUBKEY } = anchor.web3;
 
-const MALE_NFT_MINT="5RDueirYhLTZHyDSCwZ3gSWtMhFzDgj6pxFWkh3uGRf3";
-const FEMALE_NFT_MINT="ARMLau6scq9xujMvZwDdFgQr7GYFgA6bmfpjtaKZHPiK";
-
 const ConnectButton = styled(WalletDialogButton)`
   width: 100%;
   height: 60px;
@@ -247,16 +244,13 @@ const Home = (props: HomeProps) => {
         props.connection
       );
 
-      console.log(userNFTs);
-
       if (typeof userNFTs === "undefined") {
         setMaleList([]);
         setFemaleList([]);
         return null;
       } else {
-        // console.log(userNFTs);
         userNFTs.forEach(async (nft: any) => {
-          if(nft?.updateAuthority == nft_authority_owner) {
+          if(nft?.updateAuthority == nft_authority_owner && nft?.primarySaleHappened === 1) {
             try {
               let data = await (await fetch(nft?.data?.uri)).json();
 
@@ -271,8 +265,9 @@ const Home = (props: HomeProps) => {
           }
         });
 
-        console.log(males);
-        console.log(females);
+        console.log("male", males);
+        console.log("female", females);
+
         setMaleList(males);
         setFemaleList(females);
         return userNFTs;
@@ -290,16 +285,22 @@ const Home = (props: HomeProps) => {
       setIsFetching(true);
       (async () => {
         console.log('breeding initialize');
-        // const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
+        const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
 
-        // if (breeding_info === undefined) {
-        //   console.log("Transaction Failed")
-        // } else {
-        //   console.log('get nft list');
-        //   await getNFTList();
-        //   // await FetchNFT.run(...breeding_connection);
-        // }
-        await getNFTList();
+        if (breeding_info === undefined) {
+          console.log("Transaction Failed")
+        } else {
+          if(breeding_info?.isBreeding) {
+            console.log("Breeding...");
+
+            await BreedingAdapter.finishBreeding(...breeding_connection);
+          } else {
+            await getNFTList();
+          
+            await BreedingAdapter.startBreeding(...breeding_connection);
+          }
+        }
+
         setIsFetching(false);
       })();
     }

@@ -33,7 +33,7 @@ pub mod arcryptiannft_breeding_solana {
     pub fn start(ctx: Context<StartBreeding>) -> Result<()> {
         
         let breeding = &mut ctx.accounts.breeding;
-
+        
         if breeding.is_breeding == true {
             msg!("Breeding is already started.");
             return Ok(());
@@ -41,88 +41,105 @@ pub mod arcryptiannft_breeding_solana {
 
         if breeding.is_male_locked == false {
             let cpi_accounts = Transfer {
-                to: ctx.accounts.lock_account.to_account_info(),
-                from: ctx.accounts.user_wallet.to_account_info(),
+                to: ctx.accounts.male_lock_account.to_account_info(),
+                from: ctx.accounts.male_user_wallet.to_account_info(),
                 authority: ctx.accounts.authority.to_account_info(),
             };
 
-            let cpi_program = ctx.accounts.token_program.clone();
+            let cpi_program = ctx.accounts.token_program_id.clone();
 
             let context = CpiContext::new(cpi_program, cpi_accounts);
             token::transfer(context, 1)?;
 
             breeding.is_male_locked = true;
 
-            return Ok(());
-        } else if breeding.is_female_locked == false {
+        }
+        if breeding.is_female_locked == false {
             let cpi_accounts = Transfer {
-                to: ctx.accounts.lock_account.to_account_info(),
-                from: ctx.accounts.user_wallet.to_account_info(),
+                to: ctx.accounts.female_lock_account.to_account_info(),
+                from: ctx.accounts.female_user_wallet.to_account_info(),
                 authority: ctx.accounts.authority.to_account_info(),
             };
 
-            let cpi_program = ctx.accounts.token_program.clone();
+            let cpi_program = ctx.accounts.token_program_id.clone();
 
             let context = CpiContext::new(cpi_program, cpi_accounts);
             token::transfer(context, 1)?;
 
             breeding.is_female_locked = true;
-
-            return Ok(());
         }
 
         let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
         breeding.timestamp = current_timestamp;
-        breeding.is_breeding = true;
+
+        if breeding.is_male_locked && breeding.is_female_locked {
+            breeding.is_breeding = true;
+        } else {
+            msg!("Adult nft lock is failed");
+        }
         
         Ok(())
     }
 
-    // pub fn finish(ctx: Context<FinishBreeding>) -> Result<()> {
+    pub fn finish(ctx: Context<FinishBreeding>, breeding_bump: u8) -> Result<()> {
         
-    //     let breeding = &mut ctx.accounts.breeding;
+        let breeding = &mut ctx.accounts.breeding;
 
-    //     if breeding.is_breeding == false {
-    //         msg!("Breeding is not started.");
-    //         Ok(())
-    //     }
+        if breeding.is_breeding == false {
+            msg!("Breeding is not started.");
+            return Ok(());
+        }
 
-    //     if breeding.is_male_locked == true {
-    //         let cpi_accounts = Transfer {
-    //             to: ctx.accounts.lock_account.to_account_info(),
-    //             from: ctx.accounts.user_wallet.to_account_info(),
-    //             authority: ctx.accounts.authority.to_account_info(),
-    //         };
+        if breeding.is_male_locked == true {
+            let cpi_accounts = Transfer {
+                to: ctx.accounts.male_user_wallet.to_account_info(),
+                from: ctx.accounts.male_lock_account.to_account_info(),
+                authority: breeding.clone().to_account_info(),
+            };
 
-    //         let cpi_program = ctx.accounts.token_program.clone();
+            let cpi_program = ctx.accounts.token_program_id.clone();
+            
+            let context = CpiContext::new(cpi_program, cpi_accounts);
+            let authority_seeds = &[
+                breeding.authority.as_ref(),
+                &BREEDING_SEED[..],
+                &[breeding_bump]
+            ];
 
-    //         let context = CpiContext::new(cpi_program, cpi_accounts);
-    //         token::transfer(context, 1)?;
+            token::transfer(context.with_signer(&[&authority_seeds[..]]), 1)?;
 
-    //         breeding.is_male_locked = true;
+            breeding.is_male_locked = false;
+        }
+        if breeding.is_female_locked == true {
+            let cpi_accounts = Transfer {
+                to: ctx.accounts.female_user_wallet.to_account_info(),
+                from: ctx.accounts.female_lock_account.to_account_info(),
+                authority: breeding.clone().to_account_info(),
+            };
 
-    //         Ok(())
-    //     } else if breeding.is_female_locked == false {
-    //         let cpi_accounts = Transfer {
-    //             to: ctx.accounts.lock_account.to_account_info(),
-    //             from: ctx.accounts.user_wallet.to_account_info(),
-    //             authority: ctx.accounts.authority.to_account_info(),
-    //         };
+            let cpi_program = ctx.accounts.token_program_id.clone();
 
-    //         let cpi_program = ctx.accounts.token_program.clone();
+            let context = CpiContext::new(cpi_program, cpi_accounts);
+            let authority_seeds = &[
+                breeding.authority.as_ref(),
+                &BREEDING_SEED[..],
+                &[breeding_bump]
+            ];
 
-    //         let context = CpiContext::new(cpi_program, cpi_accounts);
-    //         token::transfer(context, 1)?;
+            token::transfer(context.with_signer(&[&authority_seeds[..]]), 1)?;
 
-    //         breeding.is_female_locked = true;
+            breeding.is_female_locked = true;
+        }
 
-    //         Ok(())
-    //     }
+        let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
+        breeding.timestamp = current_timestamp;
 
-    //     let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
-    //     breeding.timestamp = current_timestamp;
-    //     breeding.is_breeding = true;
+        if !breeding.is_male_locked && !breeding.is_female_locked {
+            breeding.is_breeding = false;
+        } else {
+            msg!("Adult nft unlock is failed");
+        }
         
-    //     Ok(())
-    // }
+        Ok(())
+    }
 }
