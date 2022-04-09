@@ -151,11 +151,14 @@ pub struct Breeding {
     pub is_female_locked: bool, // 1
 
     // this address is being checked as a verified creator of nft
-    pub allowed_collection_address: Pubkey
+    pub male_nft_token_mint: Pubkey,
+    pub female_nft_token_mint: Pubkey,
+    pub male_img: String,
+    pub female_img: String,
 }
 
 impl Breeding {
-    fn space() -> usize {
+    fn space(male_img: &str, female_img: &str) -> usize {
         // discriminator
         8 +
         // Pubkey
@@ -164,7 +167,11 @@ impl Breeding {
         8 +
         // bools
         1 + 1 + 1 +
-        // allowed collection pubkey
-        32
+        // male_nft_token_mint
+        32 +
+        // female_nft_token_mint
+        32 +
+        100 +
+        100
     }
 }

@@ -25,17 +25,27 @@ pub mod arcryptiannft_breeding_solana {
         breeding.is_breeding = false;
         breeding.is_male_locked = false;
         breeding.is_female_locked = false;
-        breeding.allowed_collection_address = crate::ADULT_CANDY_MACHINE_ADDRESS.parse::<Pubkey>().unwrap();
 
         Ok(())
     }
 
-    pub fn start(ctx: Context<StartBreeding>) -> Result<()> {
-        
+    pub fn start(
+        ctx: Context<StartBreeding>,
+        male_img: String,
+        female_img: String,
+        male_mint: Pubkey,
+        female_mint: Pubkey,
+        amount: u64
+    ) -> Result<()> {
         let breeding = &mut ctx.accounts.breeding;
         
         if breeding.is_breeding == true {
             msg!("Breeding is already started.");
+            return Ok(());
+        }
+
+        if amount != BREEDING_PRICE / 2 {
+            msg!("Should pay half of total value.");
             return Ok(());
         }
 
@@ -52,6 +62,8 @@ pub mod arcryptiannft_breeding_solana {
             token::transfer(context, 1)?;
 
             breeding.is_male_locked = true;
+            breeding.male_img = male_img;
+            breeding.male_nft_token_mint = male_mint;
 
         }
         if breeding.is_female_locked == false {
@@ -67,6 +79,9 @@ pub mod arcryptiannft_breeding_solana {
             token::transfer(context, 1)?;
 
             breeding.is_female_locked = true;
+            breeding.female_img = female_img;
+            breeding.female_nft_token_mint = female_mint;
+
         }
 
         let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;

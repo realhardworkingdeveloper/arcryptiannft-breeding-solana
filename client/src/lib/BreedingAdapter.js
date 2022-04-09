@@ -15,7 +15,9 @@ const { SystemProgram, SYSVAR_RENT_PUBKEY, SYSVAR_CLOCK_PUBKEY } = anchor.web3;
 const programID = new PublicKey(idl.metadata.address);
 
 const {
-  REACT_APP_BREEDING_SEED
+  REACT_APP_BREEDING_SEED,
+  REACT_APP_DIPOSIT_WALLET_ADDRESS,
+  REACT_APP_TOKEN_ACCOUNT
 } = process.env;
 
 const TOKEN_METADATA = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
@@ -86,33 +88,52 @@ export const startBreeding = async (wallet, connection) => {
 
   const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_NFT_MINT, programPDA, wallet)
   const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_NFT_MINT, programPDA, wallet)
+  
   const maleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
     MALE_NFT_MINT
   );
-
   const femaleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
     FEMALE_NFT_MINT
+  );
+  
+  const arc_mint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
+  const arc_from = await createAssociatedTokenAccount(
+    connection,
+    arc_mint,
+    program.provider.wallet.publicKey
+  );
+
+  const toPublickey = new PublicKey(REACT_APP_DIPOSIT_WALLET_ADDRESS);
+  const arc_to = await createAssociatedTokenAccount(
+    connection,
+    arc_mint,
+    toPublickey
   );
 
   try {
     await program.rpc.start({
       accounts: {
-          authority: authority,
-          breeding: programPDA,
-          maleNftTokenMint: MALE_NFT_MINT,
-          femaleNftTokenMint: FEMALE_NFT_MINT,
-          maleLockAccount: maleLockATA,
-          femaleLockAccount: femaleLockATA,
-          maleUserWallet: maleATA,
-          femaleUserWallet: femaleATA,
+        authority: authority,
+        breeding: programPDA,
 
-          tokenProgramId: TOKEN_PROGRAM_ID,
-          adultNftProgramId: TOKEN_METADATA,
-          systemProgram: SystemProgram.programId,
+        arc_from,
+        arc_to,
 
-          clock: SYSVAR_CLOCK_PUBKEY
+        maleNftTokenMint: MALE_NFT_MINT,
+        maleLockAccount: maleLockATA,
+        maleUserWallet: maleATA,
+        
+        femaleNftTokenMint: FEMALE_NFT_MINT,
+        femaleLockAccount: femaleLockATA,
+        femaleUserWallet: femaleATA,
+
+        tokenProgramId: TOKEN_PROGRAM_ID,
+        adultNftProgramId: TOKEN_METADATA,
+        systemProgram: SystemProgram.programId,
+
+        clock: SYSVAR_CLOCK_PUBKEY
       }
     });
   } catch(err) {
@@ -132,11 +153,11 @@ export const finishBreeding = async (wallet, connection) => {
 
   const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_NFT_MINT, programPDA, wallet)
   const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_NFT_MINT, programPDA, wallet)
+  
   const maleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
     MALE_NFT_MINT
   );
-
   const femaleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
     FEMALE_NFT_MINT
@@ -148,11 +169,13 @@ export const finishBreeding = async (wallet, connection) => {
       accounts: {
           authority: authority,
           breeding: programPDA,
+
           maleNftTokenMint: MALE_NFT_MINT,
-          femaleNftTokenMint: FEMALE_NFT_MINT,
           maleLockAccount: maleLockATA,
-          femaleLockAccount: femaleLockATA,
           maleUserWallet: maleATA,
+
+          femaleNftTokenMint: FEMALE_NFT_MINT,
+          femaleLockAccount: femaleLockATA,
           femaleUserWallet: femaleATA,
 
           tokenProgramId: TOKEN_PROGRAM_ID,
