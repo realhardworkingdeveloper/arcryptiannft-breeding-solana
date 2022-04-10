@@ -42,16 +42,6 @@
           "isSigner": false
         },
         {
-          "name": "maleNftTokenMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "femaleNftTokenMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "maleUserWallet",
           "isMut": true,
           "isSigner": false
@@ -68,6 +58,16 @@
         },
         {
           "name": "femaleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arcFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arcTo",
           "isMut": true,
           "isSigner": false
         },
@@ -92,7 +92,24 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "maleImg",
+          "type": "string"
+        },
+        {
+          "name": "femaleImg",
+          "type": "string"
+        },
+        {
+          "name": "maleMint",
+          "type": "publicKey"
+        },
+        {
+          "name": "femaleMint",
+          "type": "publicKey"
+        }
+      ]
     },
     {
       "name": "finish",
@@ -104,16 +121,6 @@
         },
         {
           "name": "breeding",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "maleNftTokenMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "femaleNftTokenMint",
           "isMut": true,
           "isSigner": false
         },
@@ -134,6 +141,16 @@
         },
         {
           "name": "femaleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arcFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arcTo",
           "isMut": true,
           "isSigner": false
         },
@@ -193,14 +210,34 @@
             "type": "bool"
           },
           {
-            "name": "allowedCollectionAddress",
+            "name": "isPayStart",
+            "type": "bool"
+          },
+          {
+            "name": "isPayBreed",
+            "type": "bool"
+          },
+          {
+            "name": "maleNftTokenMint",
             "type": "publicKey"
+          },
+          {
+            "name": "femaleNftTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "maleImg",
+            "type": "string"
+          },
+          {
+            "name": "femaleImg",
+            "type": "string"
           }
         ]
       }
     }
   ],
   "metadata": {
-    "address": "7MFw3o88qjGDRcvXr217A54cMp3chWi5qF2fng1qWshU"
+    "address": "E27TrKv5EHKetcVKqRyvYiRUGdm7Ldxmp31h1c675SJP"
   }
 }

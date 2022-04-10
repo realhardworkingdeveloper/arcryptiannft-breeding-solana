@@ -7,4 +7,4 @@ pub static NFT_TOKEN_PROGRAM_BYTES: &str = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8b
 
 pub static BREEDING_SEED: &[u8] = b"arcryptian_breeding";
 
-pub static BREEDING_PRICE: u64 = 10_000;
+pub static BREEDING_PRICE: u64 = 100_000_000_000;

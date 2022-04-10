@@ -14,3 +14,31 @@ Collection:  {
   collectionPDA: '8NZ1mbY6f4Zp2H6xtgtSsvkQ3cU4VyyDSXT1JikNrLKr',
   txId: 'PUdSn3F5jyCiS2JvCQswEc3w3EqbMieQggxw5QsH2acifWzTMJFjnWPMVpxBi75rWzN3GtdCeA8gjwYEnivsDbi'
 }
+
+-> baby
+Candy machine address:  Hhp7cpR7yPXZkFMh7PTAsfL2ym56nKn6ZdR7cYFswS5r
+Collection metadata address:  G5FKa62PfFEAoUBKyfCdtcCghNMQVFWmvtMzBiSM8Y6N
+Collection metadata authority:  8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
+Collection master edition address:  42ba2tVcCD8NAmodVkhAS45jTbr18pWeaYWYkDda82rZ
+Collection mint address:  F8UGmfppGdY7H3JfBgSr9Q1bry5hz98Kft8Na1DUT6SL
+Collection PDA address:  8u2QPVUDz6C1pBpQaVTWC1pkRJjd1f7LdgKGHRA9h3uG
+Collection authority record address:  ZygTxF1MJkhiMxxjpRnZR3D9EU2kWocYQY3YfTpVwCr
+Collection:  {
+  collectionMetadata: 'G5FKa62PfFEAoUBKyfCdtcCghNMQVFWmvtMzBiSM8Y6N',
+  collectionPDA: '8u2QPVUDz6C1pBpQaVTWC1pkRJjd1f7LdgKGHRA9h3uG',
+  txId: 'wyMgixYx4ZnDhhQgYbcEhR5T9YGkmvJKopWBXuUadMFZqkPqRXed63UjLN2NL4ZoV3hQrnxMjfUAZ72rNuAe6D2'
+}
+
+-> egg
+Candy machine address:  EYRghE25ngEAD53BP67VDRKJ2FLo8ayAHsCXpXMs34WV
+Collection metadata address:  tNSngpvauh14Ypm6qAF2NCeWnXyk86CMVqg5H8qdBfy
+Collection metadata authority:  8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
+Collection master edition address:  9ap53rurDNFn9ed86coNSnH8v9GVUpuzscx257cAeTo9
+Collection mint address:  GxrVKpf6nAgekNXy6K3bKoga3hWAwqNB2aDZaATpWnfp
+Collection PDA address:  73uejR5S3cSoXrJBbuSXKUDTSk3PowBALiiV5w644Ape
+Collection authority record address:  FYD96C7dBFCr3bvLAsXjZAtYW5A3i2UYTc9AU9HgVT94
+Collection:  {
+  collectionMetadata: 'tNSngpvauh14Ypm6qAF2NCeWnXyk86CMVqg5H8qdBfy',
+  collectionPDA: '73uejR5S3cSoXrJBbuSXKUDTSk3PowBALiiV5w644Ape',
+  txId: '8rtzrWSKvCpaP8tNKnhwNocNd4Jx1tJhLCQQtJU8ALsoAwcACrW7VZ5kFStTQFnHSGg5KkVpaXBCgwzxNtgdRJQ'
+}

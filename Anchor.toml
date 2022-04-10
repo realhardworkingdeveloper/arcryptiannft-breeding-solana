@@ -1,7 +1,7 @@
 [features]
 seeds = false
 [programs.localnet]
-arcryptiannft_breeding_solana = "7MFw3o88qjGDRcvXr217A54cMp3chWi5qF2fng1qWshU"
+arcryptiannft_breeding_solana = "E27TrKv5EHKetcVKqRyvYiRUGdm7Ldxmp31h1c675SJP"
 
 [registry]
 url = "https://anchor.projectserum.com"

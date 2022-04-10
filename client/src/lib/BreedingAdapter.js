@@ -54,7 +54,8 @@ export const getBreeding = async (wallet, connection) => {
     const breeding_info = await program.account.breeding.fetch(programPDA);
     
     return breeding_info;
-  } catch {
+  } catch (getInfoErr) {
+    console.log(getInfoErr);
     try {
       await program.rpc.initialize({
         accounts: {
@@ -85,7 +86,7 @@ export const startBreeding = async (wallet, connection) => {
     [authority.toBuffer(), Buffer.from(REACT_APP_BREEDING_SEED, "utf8")],
     program.programId
   );
-
+  
   const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_NFT_MINT, programPDA, wallet)
   const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_NFT_MINT, programPDA, wallet)
   
@@ -98,34 +99,36 @@ export const startBreeding = async (wallet, connection) => {
     FEMALE_NFT_MINT
   );
   
-  const arc_mint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
-  const arc_from = await createAssociatedTokenAccount(
-    connection,
-    arc_mint,
-    program.provider.wallet.publicKey
+  const arcMint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
+  const arcFrom = await findAssociatedTokenAddress(
+    wallet.publicKey,
+    arcMint
   );
 
-  const toPublickey = new PublicKey(REACT_APP_DIPOSIT_WALLET_ADDRESS);
-  const arc_to = await createAssociatedTokenAccount(
+  const adminPublickey = new PublicKey(REACT_APP_DIPOSIT_WALLET_ADDRESS);
+  const arcTo = await getOrCreateAssociatedTokenAccount(
     connection,
-    arc_mint,
-    toPublickey
+    arcMint,
+    adminPublickey,
+    wallet
   );
 
   try {
-    await program.rpc.start({
+    await program.rpc.start(
+      'male_img',
+      'female_img',
+      MALE_NFT_MINT,
+      FEMALE_NFT_MINT, {
       accounts: {
         authority: authority,
         breeding: programPDA,
 
-        arc_from,
-        arc_to,
+        arcFrom: arcFrom,
+        arcTo: arcTo,
 
-        maleNftTokenMint: MALE_NFT_MINT,
         maleLockAccount: maleLockATA,
         maleUserWallet: maleATA,
         
-        femaleNftTokenMint: FEMALE_NFT_MINT,
         femaleLockAccount: femaleLockATA,
         femaleUserWallet: femaleATA,
 
@@ -163,12 +166,30 @@ export const finishBreeding = async (wallet, connection) => {
     FEMALE_NFT_MINT
   );
 
+  const arcMint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
+  const arcFrom = await findAssociatedTokenAddress(
+    wallet.publicKey,
+    arcMint
+  );
+
+  const adminPublickey = new PublicKey(REACT_APP_DIPOSIT_WALLET_ADDRESS);
+  const arcTo = await getOrCreateAssociatedTokenAccount(
+    connection,
+    arcMint,
+    adminPublickey,
+    wallet
+  );
+
   try {
-    console.log(authority);
-    await program.rpc.finish(bump, {
+    await program.rpc.finish(
+      bump, 
+      {
       accounts: {
           authority: authority,
           breeding: programPDA,
+
+          arcFrom: arcFrom,
+          arcTo: arcTo,
 
           maleNftTokenMint: MALE_NFT_MINT,
           maleLockAccount: maleLockATA,
@@ -215,7 +236,7 @@ const getOrCreateAssociatedTokenAccount = async (
   const address = await findAssociatedTokenAddress(
     wallet,
     mint
-    );
+  );
 
   if (!(await connection.getAccountInfo(address))) {
     try {
@@ -238,7 +259,6 @@ const getOrCreateAssociatedTokenAccount = async (
 
       const signature = await connection.sendRawTransaction(signedTxn.serialize());
       let confirmed = await connection.confirmTransaction(signature);
-      console.log(signature);
     } catch {
       console.log("createAssociatedTokenAccount failed");
     }

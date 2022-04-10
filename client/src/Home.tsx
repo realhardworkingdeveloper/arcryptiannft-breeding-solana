@@ -284,20 +284,22 @@ const Home = (props: HomeProps) => {
     if (wallet.connected && !isFetching) {
       setIsFetching(true);
       (async () => {
-        console.log('breeding initialize');
         const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
 
         if (breeding_info === undefined) {
-          console.log("Transaction Failed")
+          console.log("get breeding_info Failed")
         } else {
+          console.log("breeding_info", breeding_info);
           if(breeding_info?.isBreeding) {
-            console.log("Breeding...");
-
+            console.log("finish breeding");
             await BreedingAdapter.finishBreeding(...breeding_connection);
+            console.log("finish success");
           } else {
             await getNFTList();
-          
+            
+            console.log("start breeding");
             await BreedingAdapter.startBreeding(...breeding_connection);
+            console.log("start success");
           }
         }
 

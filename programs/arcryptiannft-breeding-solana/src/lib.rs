@@ -12,7 +12,7 @@ use anchor_spl::token::{
 };
 
 
-declare_id!("7MFw3o88qjGDRcvXr217A54cMp3chWi5qF2fng1qWshU");
+declare_id!("E27TrKv5EHKetcVKqRyvYiRUGdm7Ldxmp31h1c675SJP");
 
 #[program]
 pub mod arcryptiannft_breeding_solana {
@@ -22,9 +22,6 @@ pub mod arcryptiannft_breeding_solana {
         let breeding = &mut ctx.accounts.breeding;
         breeding.authority= ctx.accounts.authority.key().clone();
         breeding.timestamp = ctx.accounts.clock.unix_timestamp as u64;
-        breeding.is_breeding = false;
-        breeding.is_male_locked = false;
-        breeding.is_female_locked = false;
 
         Ok(())
     }
@@ -34,8 +31,7 @@ pub mod arcryptiannft_breeding_solana {
         male_img: String,
         female_img: String,
         male_mint: Pubkey,
-        female_mint: Pubkey,
-        amount: u64
+        female_mint: Pubkey
     ) -> Result<()> {
         let breeding = &mut ctx.accounts.breeding;
         
@@ -44,9 +40,29 @@ pub mod arcryptiannft_breeding_solana {
             return Ok(());
         }
 
-        if amount != BREEDING_PRICE / 2 {
-            msg!("Should pay half of total value.");
+        if male_img.len() == 0 {
+            msg!("should exist male image");
             return Ok(());
+        }
+
+        if female_img.len() == 0 {
+            msg!("should exist female image");
+            return Ok(());
+        }
+
+        if !breeding.is_pay_start {
+            let cpi_accounts = Transfer {
+                to: ctx.accounts.arc_to.to_account_info(),
+                from: ctx.accounts.arc_from.to_account_info(),
+                authority: ctx.accounts.authority.to_account_info(),
+            };
+
+            let cpi_program = ctx.accounts.token_program_id.clone();
+
+            let context = CpiContext::new(cpi_program, cpi_accounts);
+            token::transfer(context, BREEDING_PRICE / 2)?;
+
+            breeding.is_pay_start = true;
         }
 
         if breeding.is_male_locked == false {
@@ -87,7 +103,7 @@ pub mod arcryptiannft_breeding_solana {
         let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
         breeding.timestamp = current_timestamp;
 
-        if breeding.is_male_locked && breeding.is_female_locked {
+        if breeding.is_male_locked && breeding.is_female_locked && breeding.is_pay_start {
             breeding.is_breeding = true;
         } else {
             msg!("Adult nft lock is failed");
@@ -96,13 +112,31 @@ pub mod arcryptiannft_breeding_solana {
         Ok(())
     }
 
-    pub fn finish(ctx: Context<FinishBreeding>, breeding_bump: u8) -> Result<()> {
+    pub fn finish(
+        ctx: Context<FinishBreeding>,
+        breeding_bump: u8
+    ) -> Result<()> {
         
         let breeding = &mut ctx.accounts.breeding;
 
         if breeding.is_breeding == false {
             msg!("Breeding is not started.");
             return Ok(());
+        }
+
+        if breeding.is_pay_start {
+            let cpi_accounts = Transfer {
+                to: ctx.accounts.arc_to.to_account_info(),
+                from: ctx.accounts.arc_from.to_account_info(),
+                authority: ctx.accounts.authority.to_account_info(),
+            };
+
+            let cpi_program = ctx.accounts.token_program_id.clone();
+
+            let context = CpiContext::new(cpi_program, cpi_accounts);
+            token::transfer(context, BREEDING_PRICE / 2)?;
+
+            breeding.is_pay_start = false;
         }
 
         if breeding.is_male_locked == true {
@@ -149,8 +183,9 @@ pub mod arcryptiannft_breeding_solana {
         let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
         breeding.timestamp = current_timestamp;
 
-        if !breeding.is_male_locked && !breeding.is_female_locked {
+        if !breeding.is_male_locked && !breeding.is_female_locked && !breeding.is_pay_start {
             breeding.is_breeding = false;
+            breeding.is_pay_start = false;
         } else {
             msg!("Adult nft unlock is failed");
         }

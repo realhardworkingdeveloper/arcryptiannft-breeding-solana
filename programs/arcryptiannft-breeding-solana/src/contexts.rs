@@ -42,12 +42,6 @@ pub struct StartBreeding<'info> {
     )]
     pub breeding: Account<'info, Breeding>,
 
-    #[account(mut)]
-    pub male_nft_token_mint: Box<Account<'info, Mint>>,
-
-    #[account(mut)]
-    pub female_nft_token_mint: Box<Account<'info, Mint>>,
-
     #[account(
         mut,
         constraint = male_user_wallet
@@ -67,6 +61,12 @@ pub struct StartBreeding<'info> {
 
     #[account(mut)]
     pub female_lock_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub arc_from: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub arc_to: Box<Account<'info, TokenAccount>>,
 
     #[account(
         constraint = 
@@ -99,12 +99,6 @@ pub struct FinishBreeding<'info> {
     )]
     pub breeding: Account<'info, Breeding>,
 
-    #[account(mut)]
-    pub male_nft_token_mint: Box<Account<'info, Mint>>,
-
-    #[account(mut)]
-    pub female_nft_token_mint: Box<Account<'info, Mint>>,
-
     #[account(
         mut,
         constraint = male_user_wallet
@@ -125,6 +119,12 @@ pub struct FinishBreeding<'info> {
     #[account(mut)]
     pub female_lock_account: Box<Account<'info, TokenAccount>>,
 
+    #[account(mut)]
+    pub arc_from: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub arc_to: Box<Account<'info, TokenAccount>>,
+
     #[account(
         constraint = 
             token_program_id.key() == crate::TOKEN_PROGRAM_BYTES.parse::<Pubkey>().unwrap(),
@@ -142,6 +142,7 @@ pub struct FinishBreeding<'info> {
 }
 
 #[account]
+#[derive(Default)]
 pub struct Breeding {
     // space 8 + 1
     pub authority: Pubkey,
@@ -149,6 +150,10 @@ pub struct Breeding {
     pub is_breeding: bool,  // 1
     pub is_male_locked: bool,   // 1
     pub is_female_locked: bool, // 1
+
+    pub is_pay_start: bool,     // 1
+
+    pub is_pay_breed: bool,     // 1
 
     // this address is being checked as a verified creator of nft
     pub male_nft_token_mint: Pubkey,
@@ -158,7 +163,7 @@ pub struct Breeding {
 }
 
 impl Breeding {
-    fn space(male_img: &str, female_img: &str) -> usize {
+    fn space() -> usize {
         // discriminator
         8 +
         // Pubkey
@@ -166,7 +171,7 @@ impl Breeding {
         // u64
         8 +
         // bools
-        1 + 1 + 1 +
+        1 + 1 + 1 + 1 + 1 +
         // male_nft_token_mint
         32 +
         // female_nft_token_mint
