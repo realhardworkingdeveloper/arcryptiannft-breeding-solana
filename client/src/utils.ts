@@ -6,6 +6,19 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
+import axios from "axios";
+
+const {
+  REACT_APP_WORLD_TIME_API_URL,
+  REACT_APP_ELAPSED_TIME,
+} = process.env;
+
+export type TimeLeft = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
 
 export interface AlertState {
   open: boolean;
@@ -14,7 +27,7 @@ export interface AlertState {
 }
 
 export interface BreedingStatus {
-  status: 'NOTSTART' | 'BREEDING' | 'READYTOMINT' | 'MINTING';
+  status: 'NOTSTART' | 'READYTOSTART' | 'BREEDING' | 'READYTOMINT' | 'MINTING';
 }
 
 export const toDate = (value?: anchor.BN) => {
@@ -24,6 +37,12 @@ export const toDate = (value?: anchor.BN) => {
 
   return new Date(value.toNumber() * 1000);
 };
+
+export interface NFTData {
+  name: string;
+  image: string;
+  mint: string;
+}
 
 const numberFormater = new Intl.NumberFormat('en-US', {
   style: 'decimal',
@@ -137,4 +156,51 @@ export function createAssociatedTokenAccountInstruction(
     programId: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     data: Buffer.from([]),
   });
+}
+
+// export const calculateTimeLeft = (startTime: number) => {
+
+//   const difference = +new Date(startTime) - +new Date();
+
+//   let timeLeft: TimeLeft = {} as TimeLeft;
+
+//   if (difference > 0) {
+//     timeLeft = {
+//       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+//       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+//       minutes: Math.floor((difference / 1000 / 60) % 60),
+//       seconds: Math.floor((difference / 1000) % 60),
+//     };
+//   }
+
+//   return timeLeft;
+// };
+
+export const getTimeRemaining = async (startTime: number) => {
+  const currentTimeData = await getWorldTime();
+  const currentTime = currentTimeData.data.datetime;
+  const secondTypeCurrentTime = new Date(currentTime).getTime() / 1000;
+
+  const day_in_sec = 60 * 60 * 24;
+  const incubation_duration = day_in_sec * (REACT_APP_ELAPSED_TIME == undefined ? 30 : +REACT_APP_ELAPSED_TIME);
+  const timeRemaining = startTime + incubation_duration - secondTypeCurrentTime;
+
+  return timeRemaining;
+}
+
+export const getTimeLeft = (timeRemaining: number) => {
+  let timeLeft: TimeLeft = {} as TimeLeft;
+
+  timeLeft = {
+    days: Math.floor(timeRemaining / (60 * 60 * 24)),
+    hours: Math.floor((timeRemaining / (60 * 60)) % 24),
+    minutes: Math.floor((timeRemaining / 60) % 60),
+    seconds: Math.floor(timeRemaining % 60),
+  };
+
+  return timeLeft
+}
+
+export const getWorldTime = async () => {
+  return (await axios.get(`${REACT_APP_WORLD_TIME_API_URL}`));
 }

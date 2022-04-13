@@ -2,11 +2,16 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import * as anchor from '@project-serum/anchor';
 
 import styled from 'styled-components';
-import { Container, Snackbar } from '@material-ui/core';
+import {
+  Container,
+  Snackbar,
+  CircularProgress
+} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import { Countdown } from './Countdown';
 import {
   PublicKey,
   Transaction,
@@ -22,7 +27,7 @@ import {
   mintOneToken,
   getCandyMachineCreator,
 } from './candy-machine';
-import { AlertState, BreedingStatus } from './utils';
+import { AlertState, BreedingStatus, getTimeRemaining, NFTData } from './utils';
 import { programs } from "@metaplex/js";
 
 import { ParentChooseButton } from './ParentChooseButton';
@@ -50,7 +55,8 @@ const { MetadataData } = programs.metadata;
 const nft_authority_owner = process.env.REACT_APP_ADULT_AUTHORITY_PUBKEY;
 
 export interface HomeProps {
-  candyMachineId?: anchor.web3.PublicKey;
+  egg_candyMachineId?: anchor.web3.PublicKey;
+  baby_candyMachineId?: anchor.web3.PublicKey;
   connection: anchor.web3.Connection;
   txTimeout: number;
   rpcHost: string;
@@ -60,7 +66,6 @@ const Home = (props: HomeProps) => {
   const [breedingStatus, setBreedingStatus] = useState<BreedingStatus>({
     status: 'NOTSTART'
   });
-  const [isParentChosen, setIsParentChosen] = useState(false);
   const [candyMachine, setCandyMachine] = useState<CandyMachineAccount>();
   const [alertState, setAlertState] = useState<AlertState>({
     open: false,
@@ -71,9 +76,12 @@ const Home = (props: HomeProps) => {
   const [isActive, setIsActive] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [itemsRemaining, setItemsRemaining] = useState<number>();
+  const [remainTime, setRemainTime] = useState<number>();
+  const [maleList, setMaleList] = useState<NFTData[]>([]);
+  const [femaleList, setFemaleList] = useState<NFTData[]>([]);
 
-  const [maleList, setMaleList] = useState([]);
-  const [femaleList, setFemaleList] = useState([]);
+  const [male, setMale] = useState<NFTData>();
+  const [female, setFemale] = useState<NFTData>();
 
   const rpcUrl = props.rpcHost;
   const wallet = useWallet();
@@ -98,15 +106,23 @@ const Home = (props: HomeProps) => {
   }, [wallet]);
 
   const refreshCandyMachineState = useCallback(async () => {
+
     if (!anchorWallet) {
       return;
     }
 
-    if (props.candyMachineId) {
+    let candyMachineId;
+    if(breedingStatus.status === 'NOTSTART') {
+      candyMachineId = props.egg_candyMachineId;
+    } else if(breedingStatus.status === 'READYTOMINT') {
+      candyMachineId = props.baby_candyMachineId;
+    }
+    
+    if (candyMachineId) {
       try {
         const cndy = await getCandyMachineState(
           anchorWallet,
-          props.candyMachineId,
+          candyMachineId,
           props.connection,
         );
 
@@ -135,6 +151,8 @@ const Home = (props: HomeProps) => {
           active = false;
         }
 
+        console.log(active);
+
         setIsActive((cndy.state.isActive = active));
         setCandyMachine(cndy);
       } catch (e) {
@@ -142,7 +160,13 @@ const Home = (props: HomeProps) => {
         console.log(e);
       }
     }
-  }, [anchorWallet, props.candyMachineId, props.connection]);
+  }, [
+    anchorWallet,
+    props.egg_candyMachineId,
+    props.baby_candyMachineId,
+    props.connection,
+    breedingStatus
+  ]);
 
   const onMint = async (
     beforeTransactions: Transaction[] = [],
@@ -151,6 +175,7 @@ const Home = (props: HomeProps) => {
     try {
       document.getElementById('#identity')?.click();
       if (wallet.connected && candyMachine?.program && wallet.publicKey) {
+
         let mintOne = await mintOneToken(
           candyMachine,
           wallet.publicKey,
@@ -182,6 +207,17 @@ const Home = (props: HomeProps) => {
             message: 'Congratulations! Mint succeeded!',
             severity: 'success',
           });
+
+          if(breedingStatus.status === 'NOTSTART') {
+            setBreedingStatus({
+              status: 'READYTOMINT'
+            });
+          } else if(breedingStatus.status === 'READYTOMINT') {
+            setBreedingStatus({
+              status: 'NOTSTART'
+            });
+          }
+          
         } else {
           setAlertState({
             open: true,
@@ -218,10 +254,13 @@ const Home = (props: HomeProps) => {
       });
       // updates the candy machine state to reflect the lastest
       // information on chain
-      refreshCandyMachineState();
     } finally {
+      refreshCandyMachineState();
     }
   };
+
+  useEffect(() => {
+  }, [breedingStatus]);
 
   const toggleMintButton = () => {
     let active = !isActive;
@@ -237,7 +276,7 @@ const Home = (props: HomeProps) => {
       return null;
     };
 
-    let userNFTs, males:any = [], females:any = [];
+    let userNFTs, males:NFTData[] = [], females:NFTData[] = [];
     try {
       userNFTs = await FetchNFTs(
         new PublicKey(publicKey),
@@ -255,9 +294,17 @@ const Home = (props: HomeProps) => {
               let data = await (await fetch(nft?.data?.uri)).json();
 
               if(data?.attributes[0]?.trait_type.charAt(0) === 'm' || data?.attributes[1]?.trait_type.charAt(0) === 'm') {
-                males.push(nft);
+                males.push({
+                  name: data?.name,
+                  image: data?.image,
+                  mint: nft?.mint
+                });
               } else if(data?.attributes[0]?.trait_type.charAt(0) === 'f' || data?.attributes[1]?.trait_type.charAt(0) === 'f') {
-                females.push(nft);
+                females.push({
+                  name: data?.name,
+                  image: data?.image,
+                  mint: nft?.mint
+                });
               }
             } catch {
               console.log("nft metadata is not available");
@@ -265,8 +312,8 @@ const Home = (props: HomeProps) => {
           }
         });
 
-        console.log("male", males);
-        console.log("female", females);
+        // console.log("male", males);
+        // console.log("female", females);
 
         setMaleList(males);
         setFemaleList(females);
@@ -279,10 +326,12 @@ const Home = (props: HomeProps) => {
   };
 
   useEffect(() => {
+    
     refreshCandyMachineState();
 
     if (wallet.connected && !isFetching) {
       setIsFetching(true);
+      
       (async () => {
         const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
 
@@ -290,15 +339,19 @@ const Home = (props: HomeProps) => {
           console.log("get breeding_info Failed")
         } else {
           console.log("breeding_info", breeding_info);
+          let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
+          console.log("remain time", remain_time);
+          setRemainTime(remain_time);
           if(breeding_info?.isBreeding) {
+            
             console.log("finish breeding");
-            await BreedingAdapter.finishBreeding(...breeding_connection);
+            // await BreedingAdapter.finishBreeding(...breeding_connection);
             console.log("finish success");
           } else {
             await getNFTList();
             
             console.log("start breeding");
-            await BreedingAdapter.startBreeding(...breeding_connection);
+            // await BreedingAdapter.startBreeding(...breeding_connection);
             console.log("start success");
           }
         }
@@ -308,40 +361,71 @@ const Home = (props: HomeProps) => {
     }
   }, [
     anchorWallet,
-    props.candyMachineId,
+    props.egg_candyMachineId,
+    props.baby_candyMachineId,
     props.connection,
     refreshCandyMachineState,
+    breedingStatus.status
   ]);
 
   return (
     <Container style={{ marginTop: 100 }}>
       <Container className='breeding' maxWidth="xs" style={{ position: 'relative' }}>
+          {
+            ((wallet.connected && breedingStatus.status !== 'NOTSTART' && breedingStatus.status !== 'MINTING') ? (
+              <Grid container style={{ marginTop: -100 }}>
+                <Grid item xs={6} style={{ paddingRight: 10 }}>
+                  <img className="preview" src={ male?.image ? male.image : "/img/no-image.png"} />
+                  <Paper className="selected_name" elevation={3} >
+                    {male ? male.name : 'No selected'}
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={6} style={{ paddingLeft: 10 }}>
+                  <img className="preview" src={ female?.image ? female.image : "/img/no-image.png"} />
+                  <Paper className="selected_name" elevation={3} >
+                    {female ? female.name : 'No selected'}
+                  </Paper>
+                </Grid>
+              </Grid>
+            ) : (<></>))
+          }
+          
           {!wallet.connected ? (
             <ConnectButton>Connect Wallet</ConnectButton>
-            // <ParentChooseButton
-            //     maleList={maleList}
-            //     femaleList={femaleList}
-            //     candyMachine={candyMachine}
-            //     setBreedingStatus={setBreedingStatus}
-            //   />
           ) : (
             breedingStatus.status === 'NOTSTART' ? (
-              <ParentChooseButton
-                maleList={maleList}
-                femaleList={femaleList}
-                candyMachine={candyMachine}
-                setBreedingStatus={setBreedingStatus}
-              />
-            ) : (
-              breedingStatus.status === 'BREEDING' ? (
-                <p>Countdown</p>
+                <ParentChooseButton
+                  maleList={maleList}
+                  femaleList={femaleList}
+                  setMale = {setMale}
+                  setFemale = {setFemale}
+                  setBreedingStatus={setBreedingStatus}
+                />
               ) : (
+                breedingStatus.status === 'READYTOSTART' ? (
                 <MintButton
                   candyMachine={candyMachine}
                   breedingStatus={breedingStatus}
                   onMint={onMint}
                   isActive={isActive}
                 />
+              ) : (
+                breedingStatus.status === 'BREEDING' ? (
+                  <Countdown
+                    remain = {remainTime === undefined ? 0 : remainTime }
+                    setBreedingStatus={setBreedingStatus}
+                  />
+                ) : (
+                  breedingStatus.status === 'READYTOMINT' ? (
+                    <MintButton
+                    candyMachine={candyMachine}
+                    breedingStatus={breedingStatus}
+                    onMint={onMint}
+                    isActive={isActive}
+                    />
+                  ) : <p>SUCCESS</p>
+                )
               )
             )
           )}

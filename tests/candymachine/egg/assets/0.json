@@ -1,14 +1,14 @@
 {
-    "name": "Arcryptian_egg0 #0",
+    "name": "Arcryptian_egg1 #0",
     "symbol": "A",
     "description": "Digital Feelings",
     "seller_fee_basis_points": 1000,
-    "image": "0.png",
+    "image": "0.jpg",
     "attributes": [
         {"trait_type": "type", "value": "arcryptian_egg"}
     ],
     "properties": {
         "creators": [{"address": "8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi", "share": 100}],
-        "files": [{"uri": "0.png", "type": "image/png"}]
+        "files": [{"uri": "0.jpg", "type": "image/jpg"}]
     }
 }

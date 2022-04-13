@@ -123,7 +123,7 @@ pub mod arcryptiannft_breeding_solana {
             msg!("Breeding is not started.");
             return Ok(());
         }
-
+        
         if breeding.is_pay_start {
             let cpi_accounts = Transfer {
                 to: ctx.accounts.arc_to.to_account_info(),
@@ -177,7 +177,7 @@ pub mod arcryptiannft_breeding_solana {
 
             token::transfer(context.with_signer(&[&authority_seeds[..]]), 1)?;
 
-            breeding.is_female_locked = true;
+            breeding.is_female_locked = false;
         }
 
         let current_timestamp = ctx.accounts.clock.unix_timestamp as u64;
@@ -185,7 +185,6 @@ pub mod arcryptiannft_breeding_solana {
 
         if !breeding.is_male_locked && !breeding.is_female_locked && !breeding.is_pay_start {
             breeding.is_breeding = false;
-            breeding.is_pay_start = false;
         } else {
             msg!("Adult nft unlock is failed");
         }

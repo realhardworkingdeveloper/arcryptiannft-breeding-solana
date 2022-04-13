@@ -1,6 +1,6 @@
 import { CandyMachineAccount } from './candy-machine';
 import { useEffect, useState, useRef } from 'react';
-import { BreedingStatus } from './utils';
+import { BreedingStatus, NFTData } from './utils';
 
 import {
   Paper,
@@ -18,47 +18,40 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import './ParentChooseModal.css';
 
-interface nftData {
-  name: string;
-  image: string;
-}
 
-const males: nftData[] = [
-  {
-    name: "Arcryptian_test0 #0",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-  {
-    name: "Arcryptian_test0 #1",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-  {
-    name: "Arcryptian_test0 #2",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-  {
-    name: "Arcryptian_test0 #3",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-];
 
-const females: nftData[] = [
-  {
-    name: "Arcryptian_test0 #2",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-  {
-    name: "Arcryptian_test0 #3",
-    image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-  },
-];
+// const males: nftData[] = [
+//   {
+//     name: "Arcryptian_test0 #0",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+//   {
+//     name: "Arcryptian_test0 #1",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+//   {
+//     name: "Arcryptian_test0 #2",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+//   {
+//     name: "Arcryptian_test0 #3",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+// ];
+
+// const females: nftData[] = [
+//   {
+//     name: "Arcryptian_test0 #2",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+//   {
+//     name: "Arcryptian_test0 #3",
+//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
+//   },
+// ];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    preview: {
-      width: '100%',
-      height: 252
-    },
     card: {
       margin: 0,
       padding: 0,
@@ -71,21 +64,16 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       textAlign: 'center'
     },
-    selected_name: {
-      top: 0,
-      background: 'rgba(3, 3, 3, 0.6)',
-      fontSize: 20,
-      width: '100%',
-      textAlign: 'center'
-    },
     image: {
       width: '100%',
       maxWidth: 200,
-      height: '100%'
+      height: '100%',
     },
     formControl: {
       width: '100%',
       maxWidth: 200,
+      border: "1px solid black !important",
+      borderRadius: 5,
     },
     body: {
       top: '50%',
@@ -98,44 +86,46 @@ const useStyles = makeStyles((theme: Theme) =>
       border: '2px solid #000',
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4),
+      borderRadius: 10
     },
   }),
 );
 
 export const ParentChooseButton = ({
-  candyMachine,
+  setMale,
+  setFemale,
   setBreedingStatus,
   maleList,
   femaleList
 }: {
-  candyMachine?: CandyMachineAccount;
+  setMale: (val: NFTData) => void;
+  setFemale: (val: NFTData) => void;
   setBreedingStatus: (val: BreedingStatus) => void;
-  maleList: any [];
-  femaleList: any [];
+  maleList: NFTData [];
+  femaleList: NFTData [];
 }) => {
+  console.log(maleList);
   const [showModal, setShowModal] = useState(false);
 
-  const [male, setMale] = useState<nftData | undefined>(undefined);
-  const [female, setFemale] = useState<nftData | undefined>(undefined);
+  const [chosenMale, setChosenMale] = useState<NFTData>();
+  const [chosenFemale, setChosenFemale] = useState<NFTData>();
 
   const classes = useStyles();
 
   const handleMaleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    let male = males.find(item => item.name === event.target.value);
-    setMale(male);
+    let male = maleList.find(item => item.name === event.target.value);
+    setChosenMale(male);
   };
 
   const handleFemaleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    let female = females.find(item => item.name === event.target.value);
-    setFemale(female);
+    let female = femaleList.find(item => item.name === event.target.value);
+    setChosenFemale(female);
   };
 
   return (
     <>
       <Button
-        onClick={() => {
-            setShowModal(true);
-        }}
+        onClick={() => setShowModal(true)}
       >
         Choose Parents
       </Button>
@@ -163,7 +153,7 @@ export const ParentChooseButton = ({
                     <em>None</em>
                   </MenuItem>
                   {
-                    males.map(male => 
+                    maleList.map(male => 
                       <MenuItem value={male.name} key={male.name}>
                         <ButtonBase className={classes.card}>
                           <img className={classes.image} alt="complex" src={male.image} />
@@ -190,7 +180,7 @@ export const ParentChooseButton = ({
                     <em>None</em>
                   </MenuItem>
                   {
-                    females.map(female => 
+                    femaleList.map(female => 
                       <MenuItem value={female.name} key={female.name}>
                         <ButtonBase className={classes.card}>
                           <img className={classes.image} alt="complex" src={female.image} />
@@ -206,16 +196,16 @@ export const ParentChooseButton = ({
             </Grid>
 
             <Grid item xs={6}>
-              <img className={classes.preview} src={ male?.image ? male.image : "/img/no-image.png"} />
-              <Paper className={classes.selected_name} elevation={3} >
-                {male ? male.name : 'No selected'}
+              <img className={'preview'} src={ chosenMale?.image ? chosenMale.image : "/img/no-image.png"} />
+              <Paper className={'selected_name'} elevation={3} >
+                {chosenMale ? chosenMale.name : 'No selected'}
               </Paper>
             </Grid>
 
             <Grid item xs={6}>
-              <img className={classes.preview} src={ female?.image ? female.image : "/img/no-image.png"} />
-              <Paper className={classes.selected_name} elevation={3} >
-                {female ? female.name : 'No selected'}
+              <img className={'preview'} src={ chosenFemale?.image ? chosenFemale.image : "/img/no-image.png"} />
+              <Paper className={'selected_name'} elevation={3} >
+                {chosenFemale ? chosenFemale.name : 'No selected'}
               </Paper>
             </Grid>
 
@@ -223,11 +213,30 @@ export const ParentChooseButton = ({
             </Grid>
 
             <Grid item xs={3}>
-              <Button variant="contained">Select</Button>
+              <Button
+              onClick={() => {
+                if(chosenMale && chosenFemale) {
+                  setMale(chosenMale);
+                  setFemale(chosenFemale);
+                  setBreedingStatus({
+                    status: 'READYTOSTART'
+                  })
+                  setShowModal(false);
+                }
+              }}
+                variant="contained"
+              >
+                Select
+              </Button>
             </Grid>
 
             <Grid item xs={3}>
-              <Button variant="contained">Cancel</Button>
+              <Button
+                variant="contained"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </Button>
             </Grid>
 
           </Grid>

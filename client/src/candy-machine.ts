@@ -453,7 +453,7 @@ export const mintOneToken = async (
     candyMachineAddress,
   );
 
-  console.log(remainingAccounts.map(rm => rm.pubkey.toBase58()));
+  // console.log(remainingAccounts.map(rm => rm.pubkey.toBase58()));
   instructions.push(
     await candyMachine.program.instruction.mintNft(creatorBump, {
       accounts: {
@@ -491,18 +491,18 @@ export const mintOneToken = async (
         (await candyMachine.program.account.collectionPda.fetch(
           collectionPDA,
         )) as CollectionData;
-      console.log(collectionData);
+      // console.log(collectionData);
       const collectionMint = collectionData.mint;
       const collectionAuthorityRecord = await getCollectionAuthorityRecordPDA(
         collectionMint,
         collectionPDA,
       );
-      console.log(collectionMint);
+      // console.log(collectionMint);
       if (collectionMint) {
         const collectionMetadata = await getMetadata(collectionMint);
         const collectionMasterEdition = await getMasterEdition(collectionMint);
-        console.log('Collection PDA: ', collectionPDA.toBase58());
-        console.log('Authority: ', candyMachine.state.authority.toBase58());
+        // console.log('Collection PDA: ', collectionPDA.toBase58());
+        // console.log('Authority: ', candyMachine.state.authority.toBase58());
         instructions.push(
           await candyMachine.program.instruction.setCollectionDuringMint({
             accounts: {
@@ -542,10 +542,10 @@ export const mintOneToken = async (
   const INIT_INSTRUCTIONS_LENGTH = 4;
   const INIT_SIGNERS_LENGTH = 1;
 
-  console.log('Transaction estimate: ', txnEstimate);
+  // console.log('Transaction estimate: ', txnEstimate);
   if (txnEstimate > 1230) {
     const initInstructions = instructions.splice(0, INIT_INSTRUCTIONS_LENGTH);
-    console.log(initInstructions);
+    // console.log(initInstructions);
     instructionsMatrix.push(initInstructions);
     const initSigners = signers.splice(0, INIT_SIGNERS_LENGTH);
     signersMatrix.push(initSigners);

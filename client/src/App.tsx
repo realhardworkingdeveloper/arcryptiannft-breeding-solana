@@ -28,20 +28,29 @@ const theme = createTheme({
   },
 });
 
-const getCandyMachineId = (): anchor.web3.PublicKey | undefined => {
+const getCandyMachineId = (type: number): anchor.web3.PublicKey | undefined => {
   try {
-    const candyMachineId = new anchor.web3.PublicKey(
-      process.env.REACT_APP_ADULT_CANDY_MACHINE_ID!,
-    );
+    if (type === 0) {
+      const egg_candyMachineId = new anchor.web3.PublicKey(
+        process.env.REACT_APP_EGG_CANDY_MACHINE_ID!,
+      );
+      return egg_candyMachineId;
+    } else {
+      const baby_candyMachineId = new anchor.web3.PublicKey(
+        process.env.REACT_APP_BABY_CANDY_MACHINE_ID!,
+      );
+      return baby_candyMachineId;
+    }
 
-    return candyMachineId;
+    
   } catch (e) {
     console.log('Failed to construct CandyMachineId', e);
     return undefined;
   }
 };
 
-const candyMachineId = getCandyMachineId();
+const egg_candyMachineId = getCandyMachineId(0);
+const baby_candyMachineId = getCandyMachineId(1);
 const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
 const rpcHost = process.env.REACT_APP_SOLANA_RPC_HOST!;
 const connection = new anchor.web3.Connection(
@@ -106,7 +115,8 @@ const App = () => {
                   <h4 style={{textAlign: 'left'}}>• Must wait for incubation</h4>
                   <br/>
                   <Home
-                    candyMachineId={candyMachineId}
+                    egg_candyMachineId={egg_candyMachineId}
+                    baby_candyMachineId={baby_candyMachineId}
                     connection={connection}
                     txTimeout={txTimeoutInMilliseconds}
                     rpcHost={rpcHost}
