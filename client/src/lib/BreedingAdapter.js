@@ -21,8 +21,6 @@ const {
 } = process.env;
 
 const TOKEN_METADATA = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
-const MALE_NFT_MINT = new PublicKey("5RDueirYhLTZHyDSCwZ3gSWtMhFzDgj6pxFWkh3uGRf3");
-const FEMALE_NFT_MINT = new PublicKey("ARMLau6scq9xujMvZwDdFgQr7GYFgA6bmfpjtaKZHPiK");
 const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const getProgram = async (wallet, connection) => {
 
@@ -77,7 +75,10 @@ export const getBreeding = async (wallet, connection) => {
   return undefined;
 };
 
-export const startBreeding = async (wallet, connection) => {
+export const startBreeding = async (wallet, connection, male, female) => {
+  const MALE_MINT = new PublicKey(male.mint);
+  const FEMALE_MINT = new PublicKey(female.mint);
+  
   const program = await getProgram(wallet, connection);
 
   const authority = program.provider.wallet.publicKey;
@@ -87,16 +88,16 @@ export const startBreeding = async (wallet, connection) => {
     program.programId
   );
   
-  const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_NFT_MINT, programPDA, wallet)
-  const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_NFT_MINT, programPDA, wallet)
+  const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_MINT, programPDA, wallet)
+  const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_MINT, programPDA, wallet)
   
   const maleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
-    MALE_NFT_MINT
+    MALE_MINT
   );
   const femaleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
-    FEMALE_NFT_MINT
+    FEMALE_MINT
   );
   
   const arcMint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
@@ -115,10 +116,10 @@ export const startBreeding = async (wallet, connection) => {
 
   try {
     await program.rpc.start(
-      'male_img',
-      'female_img',
-      MALE_NFT_MINT,
-      FEMALE_NFT_MINT, {
+      male.image,
+      female.image,
+      MALE_MINT,
+      FEMALE_MINT, {
       accounts: {
         authority: authority,
         breeding: programPDA,
@@ -144,7 +145,10 @@ export const startBreeding = async (wallet, connection) => {
   }
 }
 
-export const finishBreeding = async (wallet, connection) => {
+export const finishBreeding = async (wallet, connection, male_mint, female_mint) => {
+  const MALE_MINT = new PublicKey(male_mint);
+  const FEMALE_MINT = new PublicKey(female_mint);
+
   const program = await getProgram(wallet, connection);
 
   const authority = program.provider.wallet.publicKey;
@@ -154,16 +158,16 @@ export const finishBreeding = async (wallet, connection) => {
     program.programId
   );
 
-  const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_NFT_MINT, programPDA, wallet)
-  const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_NFT_MINT, programPDA, wallet)
+  const maleLockATA = await getOrCreateAssociatedTokenAccount(connection, MALE_MINT, programPDA, wallet)
+  const femaleLockATA = await getOrCreateAssociatedTokenAccount(connection, FEMALE_MINT, programPDA, wallet)
   
   const maleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
-    MALE_NFT_MINT
+    MALE_MINT
   );
   const femaleATA = await findAssociatedTokenAddress(
     wallet.publicKey,
-    FEMALE_NFT_MINT
+    FEMALE_MINT
   );
 
   const arcMint = new PublicKey(REACT_APP_TOKEN_ACCOUNT);
@@ -191,11 +195,11 @@ export const finishBreeding = async (wallet, connection) => {
           arcFrom: arcFrom,
           arcTo: arcTo,
 
-          maleNftTokenMint: MALE_NFT_MINT,
+          maleNftTokenMint: MALE_MINT,
           maleLockAccount: maleLockATA,
           maleUserWallet: maleATA,
 
-          femaleNftTokenMint: FEMALE_NFT_MINT,
+          femaleNftTokenMint: FEMALE_MINT,
           femaleLockAccount: femaleLockATA,
           femaleUserWallet: femaleATA,
 

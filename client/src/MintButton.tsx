@@ -28,13 +28,21 @@ export const MintButton = ({
   breedingStatus: BreedingStatus;
   isActive: boolean;
 }) => {
-  console.log(isActive)
+  console.log("onMint", isActive)
   const wallet = useWallet();
   const connection = useConnection();
   const [disable, setDisable] = useState(isActive);
   const [verified, setVerified] = useState(false);
   const [webSocketSubscriptionId, setWebSocketSubscriptionId] = useState(-1);
   const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    if (breedingStatus.status !== 'READYTOSTART' && breedingStatus.status !== 'READYTOMINT' ) {
+      setDisable(true);
+    } else {
+      setDisable(false);
+    }
+  }, [breedingStatus])
 
   const getMintButtonContent = () => {
     if (candyMachine?.state.isSoldOut) {
@@ -52,7 +60,7 @@ export const MintButton = ({
 
   return (
     <CTAButton
-      disabled={(breedingStatus.status !== 'NOTSTART' && breedingStatus.status !== 'READYTOMINT') || !disable}
+      disabled={disable}
       onClick={async () => {
           await onMint();
           setDisable(true);

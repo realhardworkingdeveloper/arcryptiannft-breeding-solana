@@ -18,38 +18,6 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import './ParentChooseModal.css';
 
-
-
-// const males: nftData[] = [
-//   {
-//     name: "Arcryptian_test0 #0",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-//   {
-//     name: "Arcryptian_test0 #1",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-//   {
-//     name: "Arcryptian_test0 #2",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-//   {
-//     name: "Arcryptian_test0 #3",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-// ];
-
-// const females: nftData[] = [
-//   {
-//     name: "Arcryptian_test0 #2",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-//   {
-//     name: "Arcryptian_test0 #3",
-//     image: "https://arweave.net/nIb93MJOgLuD9kDxCLxR8GCVcbnmZdzYA3_sREx2Ni0?ext=jpg"
-//   },
-// ];
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     card: {
@@ -104,7 +72,6 @@ export const ParentChooseButton = ({
   maleList: NFTData [];
   femaleList: NFTData [];
 }) => {
-  console.log(maleList);
   const [showModal, setShowModal] = useState(false);
 
   const [chosenMale, setChosenMale] = useState<NFTData>();

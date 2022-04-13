@@ -151,8 +151,6 @@ const Home = (props: HomeProps) => {
           active = false;
         }
 
-        console.log(active);
-
         setIsActive((cndy.state.isActive = active));
         setCandyMachine(cndy);
       } catch (e) {
@@ -172,6 +170,39 @@ const Home = (props: HomeProps) => {
     beforeTransactions: Transaction[] = [],
     afterTransactions: Transaction[] = [],
   ) => {
+    if (breedingStatus.status !== 'READYTOSTART' && breedingStatus.status !== 'READYTOMINT') {
+      return;
+    } else {
+      const breeding_info = await BreedingAdapter.getBreeding(...breeding_connection);
+      if (breeding_info === undefined) {
+        console.log("get breeding_info Failed")
+      } else {
+        if(!breeding_info?.isBreeding && breedingStatus.status === 'READYTOSTART') {
+          await BreedingAdapter.startBreeding(...breeding_connection, male, female)
+          .then( res => {
+            setBreedingStatus({
+              status: 'BREEDING'
+            });
+            console.log("start breeding success");
+          });
+        } else if (breeding_info?.isBreeding && breedingStatus.status === 'READYTOMINT') {
+          await BreedingAdapter.finishBreeding(...breeding_connection, male?.mint, female?.mint)
+          .then( res => {
+            setBreedingStatus({
+              status: 'NOTSTART'
+            });
+            console.log("finish breeding success");
+          });
+        }
+      }
+    }
+  }
+
+  const mint = async (
+    beforeTransactions: Transaction[] = [],
+    afterTransactions: Transaction[] = [],
+  ) => {
+    
     try {
       document.getElementById('#identity')?.click();
       if (wallet.connected && candyMachine?.program && wallet.publicKey) {
@@ -208,7 +239,7 @@ const Home = (props: HomeProps) => {
             severity: 'success',
           });
 
-          if(breedingStatus.status === 'NOTSTART') {
+          if(breedingStatus.status === 'READYTOSTART') {
             setBreedingStatus({
               status: 'READYTOMINT'
             });
@@ -260,6 +291,7 @@ const Home = (props: HomeProps) => {
   };
 
   useEffect(() => {
+    console.log("breedingStatus", breedingStatus.status);
   }, [breedingStatus]);
 
   const toggleMintButton = () => {
@@ -339,21 +371,28 @@ const Home = (props: HomeProps) => {
           console.log("get breeding_info Failed")
         } else {
           console.log("breeding_info", breeding_info);
-          let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
-          console.log("remain time", remain_time);
-          setRemainTime(remain_time);
-          if(breeding_info?.isBreeding) {
-            
-            console.log("finish breeding");
-            // await BreedingAdapter.finishBreeding(...breeding_connection);
-            console.log("finish success");
-          } else {
+
+          if(breedingStatus.status === 'NOTSTART') {
             await getNFTList();
-            
-            console.log("start breeding");
-            // await BreedingAdapter.startBreeding(...breeding_connection);
-            console.log("start success");
+          } else if (breedingStatus.status === 'BREEDING') {
+            let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
+            // console.log("remain time", remain_time);
+            // setRemainTime(remain_time);
+            setRemainTime(60);
           }
+          
+          // if(breeding_info?.isBreeding) {
+            
+          //   console.log("finish breeding");
+            // await BreedingAdapter.finishBreeding(...breeding_connection);
+          //   console.log("finish success");
+          // } else {
+          //   await getNFTList();
+            
+          //   console.log("start breeding");
+          //   // await BreedingAdapter.startBreeding(...breeding_connection);
+          //   console.log("start success");
+          // }
         }
 
         setIsFetching(false);
