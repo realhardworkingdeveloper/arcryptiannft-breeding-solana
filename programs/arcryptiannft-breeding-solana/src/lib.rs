@@ -123,7 +123,18 @@ pub mod arcryptiannft_breeding_solana {
             msg!("Breeding is not started.");
             return Ok(());
         }
-        
+
+        let cpi_accounts = Transfer {
+            to: ctx.accounts.egg_lock_account.to_account_info(),
+            from: ctx.accounts.egg_user_wallet.to_account_info(),
+            authority: ctx.accounts.authority.to_account_info(),
+        };
+
+        let cpi_program = ctx.accounts.token_program_id.clone();
+
+        let context = CpiContext::new(cpi_program, cpi_accounts);
+        token::transfer(context, 1)?;
+
         if breeding.is_pay_start {
             let cpi_accounts = Transfer {
                 to: ctx.accounts.arc_to.to_account_info(),

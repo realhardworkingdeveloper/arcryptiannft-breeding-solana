@@ -135,12 +135,22 @@
           "isSigner": false
         },
         {
+          "name": "eggUserWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "maleLockAccount",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "femaleLockAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eggLockAccount",
           "isMut": true,
           "isSigner": false
         },

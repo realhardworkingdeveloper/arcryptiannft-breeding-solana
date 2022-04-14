@@ -113,11 +113,21 @@ pub struct FinishBreeding<'info> {
     )]
     pub female_user_wallet: Box<Account<'info, TokenAccount>>,
 
+    #[account(
+        mut,
+        constraint = egg_user_wallet
+         .clone().into_inner().deref().owner == authority.key(),
+    )]
+    pub egg_user_wallet: Box<Account<'info, TokenAccount>>,
+
     #[account(mut)]
     pub male_lock_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub female_lock_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub egg_lock_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub arc_from: Box<Account<'info, TokenAccount>>,

@@ -140,14 +140,18 @@ export const startBreeding = async (wallet, connection, male, female) => {
         clock: SYSVAR_CLOCK_PUBKEY
       }
     });
+    console.log("start breeding success");
+    return true;
   } catch(err) {
     console.log("adult lock failed", err);
+    return false;
   }
 }
 
-export const finishBreeding = async (wallet, connection, male_mint, female_mint) => {
-  const MALE_MINT = new PublicKey(male_mint);
-  const FEMALE_MINT = new PublicKey(female_mint);
+export const finishBreeding = async (wallet, connection, male_mint, female_mint, egg_mint) => {
+  const MALE_MINT = male_mint;
+  const FEMALE_MINT = female_mint;
+  const EGG_MINT = new PublicKey(egg_mint);
 
   const program = await getProgram(wallet, connection);
 
@@ -184,6 +188,14 @@ export const finishBreeding = async (wallet, connection, male_mint, female_mint)
     wallet
   );
 
+  const eggLockATA = 
+    await getOrCreateAssociatedTokenAccount(connection, EGG_MINT, programPDA, wallet)
+  
+  const eggATA = await findAssociatedTokenAddress(
+    wallet.publicKey,
+    EGG_MINT
+  );
+
   try {
     await program.rpc.finish(
       bump, 
@@ -203,6 +215,9 @@ export const finishBreeding = async (wallet, connection, male_mint, female_mint)
           femaleLockAccount: femaleLockATA,
           femaleUserWallet: femaleATA,
 
+          eggLockAccount: eggLockATA,
+          eggUserWallet: eggATA,
+
           tokenProgramId: TOKEN_PROGRAM_ID,
           adultNftProgramId: TOKEN_METADATA,
           systemProgram: SystemProgram.programId,
@@ -211,8 +226,10 @@ export const finishBreeding = async (wallet, connection, male_mint, female_mint)
       }
     });
     console.log("unlock success");
+    return true;
   } catch(err) {
     console.log("adult lock failed", err);
+    return false;
   }
 }
 

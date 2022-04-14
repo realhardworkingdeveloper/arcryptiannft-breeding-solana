@@ -181,8 +181,8 @@ export const getTimeRemaining = async (startTime: number) => {
   const currentTime = currentTimeData.data.datetime;
   const secondTypeCurrentTime = new Date(currentTime).getTime() / 1000;
 
-  const day_in_sec = 60 * 60 * 24;
-  const incubation_duration = day_in_sec * (REACT_APP_ELAPSED_TIME == undefined ? 30 : +REACT_APP_ELAPSED_TIME);
+  const min_in_sec = 60;
+  const incubation_duration = min_in_sec * (REACT_APP_ELAPSED_TIME == undefined ? 30 : +REACT_APP_ELAPSED_TIME);
   const timeRemaining = startTime + incubation_duration - secondTypeCurrentTime;
 
   return timeRemaining;

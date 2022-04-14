@@ -82,6 +82,7 @@ const Home = (props: HomeProps) => {
 
   const [male, setMale] = useState<NFTData>();
   const [female, setFemale] = useState<NFTData>();
+  const [egg, setEgg] = useState<NFTData>();
 
   const rpcUrl = props.rpcHost;
   const wallet = useWallet();
@@ -112,7 +113,7 @@ const Home = (props: HomeProps) => {
     }
 
     let candyMachineId;
-    if(breedingStatus.status === 'NOTSTART') {
+    if(breedingStatus.status === 'READYTOSTART') {
       candyMachineId = props.egg_candyMachineId;
     } else if(breedingStatus.status === 'READYTOMINT') {
       candyMachineId = props.baby_candyMachineId;
@@ -166,10 +167,7 @@ const Home = (props: HomeProps) => {
     breedingStatus
   ]);
 
-  const onMint = async (
-    beforeTransactions: Transaction[] = [],
-    afterTransactions: Transaction[] = [],
-  ) => {
+  const onMint = async () => {
     if (breedingStatus.status !== 'READYTOSTART' && breedingStatus.status !== 'READYTOMINT') {
       return;
     } else {
@@ -177,22 +175,50 @@ const Home = (props: HomeProps) => {
       if (breeding_info === undefined) {
         console.log("get breeding_info Failed")
       } else {
+
         if(!breeding_info?.isBreeding && breedingStatus.status === 'READYTOSTART') {
-          await BreedingAdapter.startBreeding(...breeding_connection, male, female)
-          .then( res => {
+          setIsActive(false);
+          let res = await BreedingAdapter.startBreeding(...breeding_connection, male, female);
+          
+          if(res) {
+            await mint();
+
             setBreedingStatus({
               status: 'BREEDING'
             });
-            console.log("start breeding success");
-          });
+
+            setAlertState({
+              open: true,
+              message: 'Congratulations! Start Breeding succeeded!',
+              severity: 'success',
+            });
+          }
+          setIsActive(true);
         } else if (breeding_info?.isBreeding && breedingStatus.status === 'READYTOMINT') {
-          await BreedingAdapter.finishBreeding(...breeding_connection, male?.mint, female?.mint)
-          .then( res => {
+          setIsActive(false);
+          
+          console.log(egg);
+          let res = await BreedingAdapter.finishBreeding(
+            ...breeding_connection, 
+            breeding_info?.maleNftTokenMint, 
+            breeding_info?.femaleNftTokenMint,
+            egg?.mint
+          );
+          
+          if(res) {
+            await mint();
+
             setBreedingStatus({
               status: 'NOTSTART'
             });
-            console.log("finish breeding success");
-          });
+
+            setAlertState({
+              open: true,
+              message: 'Congratulations! Breeding succeeded!',
+              severity: 'success',
+            });
+          }
+          setIsActive(true);
         }
       }
     }
@@ -202,6 +228,8 @@ const Home = (props: HomeProps) => {
     beforeTransactions: Transaction[] = [],
     afterTransactions: Transaction[] = [],
   ) => {
+
+    let result;
     
     try {
       document.getElementById('#identity')?.click();
@@ -233,28 +261,10 @@ const Home = (props: HomeProps) => {
           setItemsRemaining(remaining);
           setIsActive((candyMachine.state.isActive = remaining > 0));
           candyMachine.state.isSoldOut = remaining === 0;
-          setAlertState({
-            open: true,
-            message: 'Congratulations! Mint succeeded!',
-            severity: 'success',
-          });
-
-          if(breedingStatus.status === 'READYTOSTART') {
-            setBreedingStatus({
-              status: 'READYTOMINT'
-            });
-          } else if(breedingStatus.status === 'READYTOMINT') {
-            setBreedingStatus({
-              status: 'NOTSTART'
-            });
-          }
           
+          result = true;
         } else {
-          setAlertState({
-            open: true,
-            message: 'Mint failed! Please try again!',
-            severity: 'error',
-          });
+          result = false;
         }
       }
     } catch (error: any) {
@@ -283,22 +293,20 @@ const Home = (props: HomeProps) => {
         message,
         severity: 'error',
       });
+
+      result = false;
+
       // updates the candy machine state to reflect the lastest
       // information on chain
     } finally {
       refreshCandyMachineState();
+      return result;  
     }
   };
 
   useEffect(() => {
     console.log("breedingStatus", breedingStatus.status);
   }, [breedingStatus]);
-
-  const toggleMintButton = () => {
-    let active = !isActive;
-
-    setIsActive((candyMachine!.state.isActive = active));
-  };
 
   const getNFTList = async () =>  {
     const { publicKey } = wallet;
@@ -322,9 +330,10 @@ const Home = (props: HomeProps) => {
       } else {
         userNFTs.forEach(async (nft: any) => {
           if(nft?.updateAuthority == nft_authority_owner && nft?.primarySaleHappened === 1) {
+            
             try {
               let data = await (await fetch(nft?.data?.uri)).json();
-
+              
               if(data?.attributes[0]?.trait_type.charAt(0) === 'm' || data?.attributes[1]?.trait_type.charAt(0) === 'm') {
                 males.push({
                   name: data?.name,
@@ -337,7 +346,20 @@ const Home = (props: HomeProps) => {
                   image: data?.image,
                   mint: nft?.mint
                 });
+              } else if(data?.attributes.length == 1) {
+                setEgg({
+                  name: data?.name,
+                  image: data?.image,
+                  mint: nft?.mint
+                });
+
+                console.log({
+                  name: data?.name,
+                  image: data?.image,
+                  mint: nft?.mint
+                });
               }
+
             } catch {
               console.log("nft metadata is not available");
             }
@@ -372,14 +394,49 @@ const Home = (props: HomeProps) => {
         } else {
           console.log("breeding_info", breeding_info);
 
-          if(breedingStatus.status === 'NOTSTART') {
-            await getNFTList();
-          } else if (breedingStatus.status === 'BREEDING') {
-            let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
-            // console.log("remain time", remain_time);
-            // setRemainTime(remain_time);
-            setRemainTime(60);
+          await getNFTList();
+          
+          if (breeding_info?.maleImg) {
+            setMale({
+              name: male?.name === undefined ? '' : male?.name,
+              image: breeding_info?.maleImg,
+              mint: male?.mint === undefined ? '' : male?.mint
+            });
           }
+          
+          if (breeding_info?.femaleImg) {
+            setFemale({
+              name: female?.name === undefined ? '' : female?.name,
+              image: breeding_info?.femaleImg,
+              mint: female?.mint === undefined ? '' : female?.mint
+            });
+          }
+          
+
+          if(breeding_info?.isBreeding && breedingStatus.status !== 'READYTOMINT') {
+            let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
+            if (remain_time > 0) {
+              setRemainTime(remain_time);
+              setBreedingStatus({
+                status: 'BREEDING'
+              });
+            } else {
+              setBreedingStatus({
+                status: 'READYTOMINT'
+              });
+            }
+          }
+          
+
+
+          // if(breedingStatus.status === 'NOTSTART') {
+          //   await getNFTList();
+          // } else if (breedingStatus.status === 'BREEDING') {
+          //   let remain_time = await getTimeRemaining(breeding_info?.timestamp.toNumber());
+          //   // console.log("remain time", remain_time);
+          //   // setRemainTime(remain_time);
+          //   setRemainTime(10);
+          // }
           
           // if(breeding_info?.isBreeding) {
             

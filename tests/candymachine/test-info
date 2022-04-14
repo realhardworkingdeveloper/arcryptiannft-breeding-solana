@@ -16,27 +16,7 @@ Collection:  {
 }
 
 -> baby
-Collection metadata authority:  8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
-Collection master edition address:  FE3RPjNbbuMSBpx3nbXV4W8fwxhE6vvM7YgaGkRs8r4A
-Collection mint address:  EjacZA9RMiX1w1LGXbzomfoLVKTvQ1wgSCvkvNXPsKHV
-Collection PDA address:  AMnStAjmqa2F2ML7L2drdcKFoiK2fe5hCtxtpthLVesS
-Collection authority record address:  DzUBE8HL1hULGrvpozBbUv3fSjz75kxjHpseziPaDQgU
-Collection:  {
-  collectionMetadata: 'AVL979H4BqaWmoaijCWqpuHfmTmtSSxiUSQf5qC6NaEu',
-  collectionPDA: 'AMnStAjmqa2F2ML7L2drdcKFoiK2fe5hCtxtpthLVesS',
-  txId: '3xqrtZN4eR2PFoAui2Wa1vF2w4sAHihf4J8LaHkjGYaMqYbdGf1UTzqvvWBN6ZDyfXnU2HngsHsec5DubZpdUEV4'
-}
+Collection metadata authority:  92pRbQo8aCj6DMaBpcnYKE1RJeC9L4tuHNcayxMP6VaX
 
 -> egg
 Candy machine address:  7hdr1Tba5kd9eS4j4rAovLCZ7kdwbMPf1f4Pm9nJGEfi
-Collection metadata address:  HT5Cqqowo7sQKi1Q2GiYjVZXC87B3eWfgmTW9fTidhvb
-Collection metadata authority:  8GejL9cQm9hJoXUDiWaQwWADY67TNrib7CmaCVCcCcKi
-Collection master edition address:  HyrL54HQhi1owkndJmHAb5PeFoG9d7SEc597eobWupkc
-Collection mint address:  GrEeZiYaK8MTnnDWFF5f7qd14AfHn3aV6Qsv9uYNvSTn
-Collection PDA address:  BmtoFWrC8NwwRcv39io48dFUrBqKqYDT3uNoUTkckxxM
-Collection authority record address:  6MkQxejojatDTqiznn3ebDwEBwDWy6zgspFrEmBb3Mt4
-Collection:  {
-  collectionMetadata: 'HT5Cqqowo7sQKi1Q2GiYjVZXC87B3eWfgmTW9fTidhvb',
-  collectionPDA: 'BmtoFWrC8NwwRcv39io48dFUrBqKqYDT3uNoUTkckxxM',
-  txId: '5EjHB4bZjcWvcsddKtnveMMX7QhABvRiwZaRraRuBUZj1EQhgEwJK2E8yx14SYdFBxJEtqoyhkGrM6MT34wjDasC'
-}
