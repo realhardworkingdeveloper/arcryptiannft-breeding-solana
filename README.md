@@ -15,7 +15,7 @@
 ---
 ### How to use
 `anchor build`<br>
-If you build program first time, you will get keypair  json. You could get program_id from `solana address <keypair-json>`.<br>
+If you build program first time, you will get keypair  json.<br> You could get program_id from `solana address <keypair-json>`.<br>
 `anchor test`<br>
 If you've done `anchor test`, you could get idl file with program_id from target/idl.<br>
 Copy idl to client/src/idl.<br>
